@@ -61,6 +61,38 @@ Sau khi phân tích xong:
 
 ---
 
+## ⚖️ CƠ CHẾ TRỌNG TÀI PHÂN XỬ XUNG ĐỘT (CONFLICT ARBITRATION)
+
+Khi kho kỹ năng mở rộng (nạp thêm hàng chục skills mới từ nhiều tác giả GitHub khác nhau), nguy cơ xung đột triết lý và chỉ dẫn đối nghịch sẽ xuất hiện. `dsg` giải quyết triệt để vấn đề này bằng 3 nguyên tắc bất di bất dịch:
+
+### 1. Cô Lập Ngữ Cảnh Tuyệt Đối (Context Isolation)
+- **Cấm kỵ**: Không bao giờ nạp toàn bộ danh sách kỹ năng vào context window của AI cùng lúc, vì sẽ gây "loãng não" và sinh ảo giác (hallucination).
+- **Kỷ luật**: `dsg` chỉ bốc đúng **1 hoặc 2 skill** liên quan trực tiếp tới tác vụ hiện thời. Các skill đối nghịch khác nằm nguyên vẹn trên đĩa cứng, hoàn toàn bị cô lập khỏi bộ nhớ hoạt động.
+
+### 2. Thứ Bậc Ưu Tiên Của Sự Thật (Hierarchy of Truth)
+Khi 2 kỹ năng đưa ra chỉ dẫn trái ngược nhau (ví dụ: *Làm nhanh bỏ qua test* vs *TDD nghiêm ngặt*):
+1. **Ưu tiên 1 (Tối cao)**: Tính toàn vẹn và an toàn của mã nguồn (Guardrails - Giới hạn số dòng, không làm hỏng chức năng đang chạy, không ghi đè lịch sử Git nguy hiểm).
+2. **Ưu tiên 2**: Đặc tả kỹ thuật và kiến trúc module sâu (`to-spec`, `codebase-design`).
+3. **Ưu tiên 3**: Kỹ thuật thực thi cụ thể (`tdd`, `implement`).
+*Bất kỳ skill nào từ bên ngoài xúi giục viết code ẩu hoặc phá vỡ cấu trúc modularity đều sẽ bị `dsg` chặn lại.*
+
+### 3. Minh Bạch Đánh Đổi (Trade-off Transparency)
+Nếu tồn tại 2 skill cùng giải quyết một việc nhưng theo 2 cách tiếp cận khác nhau (ví dụ: `prototype` để thử nghiệm nhanh vs `tdd` để viết sản phẩm chạy thật):
+- `dsg` sẽ ghi rõ trong báo cáo:
+  > *"Phát hiện 2 phương án: Skill A (làm nhanh) vs Skill B (chuẩn mực). Chọn Skill B vì dự án đang ở trạng thái Production cần độ tin cậy tuyệt đối."*
+
+---
+
+## 📥 QUY TRÌNH THẨM ĐỊNH KHI NẠP SKILL MỚI (SKILL INGESTION)
+
+Khi bạn muốn thêm skill từ một repository GitHub khác vào kho:
+1. **Chạy công cụ thẩm định**: Dùng lệnh `python3 scripts/ingest_skill.py <đường_dẫn_skill>`.
+2. **Rà soát xung đột**: Công cụ sẽ tự đối chiếu với 49 skills hiện có xem có bị trùng lặp chức năng hoặc xung đột triết lý không.
+3. **Phân nhánh tự động**: Tự động xếp vào đúng 1 trong 6 nhánh nghiệp vụ của `dsg`.
+4. **Việt hóa giải thích**: Tự động bổ sung khối Giải thích tiếng Việt thực chiến (`what`, `when`, `benefit`) để hiển thị trên Web Hub mà không làm thay đổi nội dung tiếng Anh gốc.
+
+---
+
 ## 📋 MẪU THỰC TẾ MINH HOẠ KHI CHẠY /dsg
 
 ### Ví dụ: Khi bạn sửa file dài 600 dòng và bắt đầu thấy rối

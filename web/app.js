@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // State
   let searchQuery = '';
-  let selectedCategory = 'all';
+  let selectedBranch = 'all';
   let filterUserInvoked = true;
   let filterModelInvoked = true;
   let activePhaseTab = '1. Discovery & Planning';
@@ -256,8 +256,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const q = searchQuery.toLowerCase().trim();
 
     const filtered = skillsData.filter(s => {
-      // Category filter
-      if (selectedCategory !== 'all' && s.category.toLowerCase() !== selectedCategory) {
+      // Branch filter
+      if (selectedBranch !== 'all' && s.branch !== selectedBranch) {
         return false;
       }
 
@@ -270,10 +270,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const matchName = s.name.toLowerCase().includes(q);
         const matchId = s.id.toLowerCase().includes(q);
         const matchDesc = s.description.toLowerCase().includes(q);
-        const matchPhase = (s.phase || '').toLowerCase().includes(q);
+        const matchBranch = (s.branch || '').toLowerCase().includes(q);
         const matchViWhat = s.vi && s.vi.what ? s.vi.what.toLowerCase().includes(q) : false;
         const matchViWhen = s.vi && s.vi.when ? s.vi.when.toLowerCase().includes(q) : false;
-        if (!matchName && !matchId && !matchDesc && !matchPhase && !matchViWhat && !matchViWhen) return false;
+        if (!matchName && !matchId && !matchDesc && !matchBranch && !matchViWhat && !matchViWhen) return false;
       }
 
       return true;
@@ -295,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="skill-card" data-skill-id="${s.id}">
             <div class="card-top">
               <div class="card-badges">
-                <span class="badge badge-category">${s.category}</span>
+                <span class="badge badge-category">${s.branch}</span>
                 <span class="badge ${s.userInvoked ? 'badge-user-invoked' : 'badge-model-invoked'}">
                   ${s.userInvoked ? '⚡ User-invoked' : '🤖 Model-invoked'}
                 </span>
@@ -356,7 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
     modalDesc.textContent = skill.description;
     modalCategoryBadge.textContent = skill.category.toUpperCase();
     modalTypeBadge.textContent = skill.userInvoked ? 'User-invoked (Lệnh gõ tay)' : 'Model-invoked (Tự động)';
-    modalPhaseBadge.textContent = skill.phase || 'General';
+    modalPhaseBadge.textContent = skill.branch || 'Chung';
 
     // Populate Vietnamese explanation
     if (skill.vi) {
@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
     pill.addEventListener('click', () => {
       categoryPills.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
       pill.classList.add('active');
-      selectedCategory = pill.getAttribute('data-category');
+      selectedBranch = pill.getAttribute('data-branch') || 'all';
       filterAndRenderSkills();
     });
   });
@@ -451,9 +451,9 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.value = '';
     searchQuery = '';
     clearSearchBtn.style.display = 'none';
-    selectedCategory = 'all';
+    selectedBranch = 'all';
     categoryPills.querySelectorAll('.filter-pill').forEach(p => {
-      p.classList.toggle('active', p.getAttribute('data-category') === 'all');
+      p.classList.toggle('active', p.getAttribute('data-branch') === 'all');
     });
     checkboxUser.checked = true;
     checkboxModel.checked = true;

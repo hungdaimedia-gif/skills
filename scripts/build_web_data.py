@@ -8,67 +8,68 @@ os.makedirs(output_web_dir, exist_ok=True)
 
 skills = []
 
-phase_mapping = {
-    # Discovery & Planning
-    "dsg": "1. Discovery & Planning",
-    "ask-matt": "1. Discovery & Planning",
-    "grill-me": "1. Discovery & Planning",
-    "grill-with-docs": "1. Discovery & Planning",
-    "grilling": "1. Discovery & Planning",
-    "domain-modeling": "1. Discovery & Planning",
-    "to-spec": "1. Discovery & Planning",
-    "to-tickets": "1. Discovery & Planning",
-    "wayfinder": "1. Discovery & Planning",
-    "to-questionnaire": "1. Discovery & Planning",
-    "wait-what": "1. Discovery & Planning",
-    "research": "1. Discovery & Planning",
-    "project-blueprint-loop-architect": "1. Discovery & Planning",
-    
-    # Architecture & Design
-    "codebase-design": "2. Architecture & Design",
-    "fullstack-boilerplate-architect": "2. Architecture & Design",
-    "workflow-node-studio": "2. Architecture & Design",
-    "prototype": "2. Architecture & Design",
-    "setup-ts-deep-modules": "2. Architecture & Design",
-    "improve-codebase-architecture": "2. Architecture & Design",
-    
-    # Implementation & TDD
-    "implement": "3. Implementation & TDD",
-    "implement-spec": "3. Implementation & TDD",
-    "tdd": "3. Implementation & TDD",
-    "claude-task-runner": "3. Implementation & TDD",
-    "loop-me": "3. Implementation & TDD",
-    "teach": "3. Implementation & TDD",
-    "writing-beats": "3. Implementation & TDD",
-    "writing-fragments": "3. Implementation & TDD",
-    "writing-shape": "3. Implementation & TDD",
-    "writing-for-agents": "3. Implementation & TDD",
-    
-    # Review & Guardrails
-    "code-review": "4. Review & Quality Guardrails",
-    "codebase-line-budget-guard": "4. Review & Quality Guardrails",
-    "resolving-merge-conflicts": "4. Review & Quality Guardrails",
-    "git-guardrails-claude-code": "4. Review & Quality Guardrails",
-    "setup-pre-commit": "4. Review & Quality Guardrails",
-    "retro": "4. Review & Quality Guardrails",
-    "handoff": "4. Review & Quality Guardrails",
-    "claude-handoff": "4. Review & Quality Guardrails",
-    
-    # Debugging & Recovery
-    "agent-disorientation-recovery": "5. Debugging & Recovery",
-    "code-bug-inspector": "5. Debugging & Recovery",
-    "diagnosing-bugs": "5. Debugging & Recovery",
-    "system-logs-and-diagnostics": "5. Debugging & Recovery",
-    "triage": "5. Debugging & Recovery",
-    
-    # Setup & Operations
-    "macos-m1-multiagent-setup": "6. Setup & Operations",
-    "multiagent-setup-crossplatform": "6. Setup & Operations",
-    "chrome-web-store-prep": "6. Setup & Operations",
-    "wizard": "6. Setup & Operations",
-    "setup-matt-pocock-skills": "6. Setup & Operations",
-    "migrate-to-shoehorn": "6. Setup & Operations",
-    "scaffold-exercises": "6. Setup & Operations"
+# Refined 6-Branch User-Centric Taxonomy
+branch_mapping = {
+    # 1. Ý tưởng & Đặc tả (Discovery & Planning)
+    "dsg": "💡 Ý tưởng & Đặc tả",
+    "ask-matt": "💡 Ý tưởng & Đặc tả",
+    "grill-me": "💡 Ý tưởng & Đặc tả",
+    "grill-with-docs": "💡 Ý tưởng & Đặc tả",
+    "grilling": "💡 Ý tưởng & Đặc tả",
+    "domain-modeling": "💡 Ý tưởng & Đặc tả",
+    "to-spec": "💡 Ý tưởng & Đặc tả",
+    "to-tickets": "💡 Ý tưởng & Đặc tả",
+    "wayfinder": "💡 Ý tưởng & Đặc tả",
+    "to-questionnaire": "💡 Ý tưởng & Đặc tả",
+    "research": "💡 Ý tưởng & Đặc tả",
+    "project-blueprint-loop-architect": "💡 Ý tưởng & Đặc tả",
+
+    # 2. Kiến trúc & Thiết kế hệ thống (Architecture & Design)
+    "codebase-design": "🏗️ Kiến trúc & Thiết kế",
+    "fullstack-boilerplate-architect": "🏗️ Kiến trúc & Thiết kế",
+    "workflow-node-studio": "🏗️ Kiến trúc & Thiết kế",
+    "prototype": "🏗️ Kiến trúc & Thiết kế",
+    "setup-ts-deep-modules": "🏗️ Kiến trúc & Thiết kế",
+    "improve-codebase-architecture": "🏗️ Kiến trúc & Thiết kế",
+
+    # 3. Thực thi & Viết Code chuẩn mực (Implementation & TDD)
+    "implement": "⚡ Viết Code & TDD",
+    "implement-spec": "⚡ Viết Code & TDD",
+    "tdd": "⚡ Viết Code & TDD",
+    "claude-task-runner": "⚡ Viết Code & TDD",
+    "loop-me": "⚡ Viết Code & TDD",
+    "teach": "⚡ Viết Code & TDD",
+    "writing-beats": "⚡ Viết Code & TDD",
+    "writing-fragments": "⚡ Viết Code & TDD",
+    "writing-shape": "⚡ Viết Code & TDD",
+    "writing-for-agents": "⚡ Viết Code & TDD",
+
+    # 4. Kiểm soát chất lượng & Review (Quality & Guardrails)
+    "codebase-line-budget-guard": "🛡️ Kiểm soát & Review",
+    "code-review": "🛡️ Kiểm soát & Review",
+    "resolving-merge-conflicts": "🛡️ Kiểm soát & Review",
+    "git-guardrails-claude-code": "🛡️ Kiểm soát & Review",
+    "setup-pre-commit": "🛡️ Kiểm soát & Review",
+    "retro": "🛡️ Kiểm soát & Review",
+    "handoff": "🛡️ Kiểm soát & Review",
+    "claude-handoff": "🛡️ Kiểm soát & Review",
+
+    # 5. Cứu hộ & Gỡ lỗi chuyên sâu (Debugging & Recovery)
+    "agent-disorientation-recovery": "🩺 Cứu hộ & Gỡ lỗi",
+    "code-bug-inspector": "🩺 Cứu hộ & Gỡ lỗi",
+    "diagnosing-bugs": "🩺 Cứu hộ & Gỡ lỗi",
+    "system-logs-and-diagnostics": "🩺 Cứu hộ & Gỡ lỗi",
+    "triage": "🩺 Cứu hộ & Gỡ lỗi",
+    "wait-what": "🩺 Cứu hộ & Gỡ lỗi",
+
+    # 6. Nền tảng & Đóng gói phát hành (Platform & Deployment)
+    "macos-m1-multiagent-setup": "🚀 Nền tảng & Vận hành",
+    "multiagent-setup-crossplatform": "🚀 Nền tảng & Vận hành",
+    "chrome-web-store-prep": "🚀 Nền tảng & Vận hành",
+    "wizard": "🚀 Nền tảng & Vận hành",
+    "setup-matt-pocock-skills": "🚀 Nền tảng & Vận hành",
+    "migrate-to-shoehorn": "🚀 Nền tảng & Vận hành",
+    "scaffold-exercises": "🚀 Nền tảng & Vận hành"
 }
 
 # Rich Vietnamese Explanations for all skills
@@ -353,7 +354,7 @@ for root, dirs, files in os.walk(skills_dir):
             lines = [l.strip() for l in body.split("\n") if l.strip() and not l.startswith("#")]
             description = lines[0] if lines else "Engineering skill for coding agents."
             
-        phase = phase_mapping.get(skill_name, "3. Implementation & TDD")
+        branch = branch_mapping.get(skill_name, "⚡ Viết Code & TDD")
         
         # Pull Vietnamese explanation
         vi_meta = vi_explanations.get(skill_name, {
@@ -366,7 +367,7 @@ for root, dirs, files in os.walk(skills_dir):
             "id": skill_name,
             "name": name,
             "category": category,
-            "phase": phase,
+            "branch": branch,
             "userInvoked": user_invoked,
             "description": description,       # Original English / source description
             "vi": vi_meta,                    # Rich Vietnamese plain explanation
@@ -374,7 +375,7 @@ for root, dirs, files in os.walk(skills_dir):
             "path": f"skills/{rel}/SKILL.md"
         })
 
-skills.sort(key=lambda s: (s["phase"], s["name"]))
+skills.sort(key=lambda s: (s["branch"], s["name"]))
 
 output_js = os.path.join(output_web_dir, "skills-data.js")
 with open(output_js, "w", encoding="utf-8") as f:

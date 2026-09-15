@@ -1,0 +1,39 @@
+name: Skill Request / Đề xuất Skill mới
+description: Đề xuất thêm một skill mới vào kho
+labels: ["skill-request"]
+body:
+  - type: input
+    id: skill-name
+    attributes:
+      label: Tên skill đề xuất
+      placeholder: "vd: api-contract-testing"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: domain
+    attributes:
+      label: Domain
+      options:
+        - engineering
+        - writing
+        - art
+        - finance
+        - productivity
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Vấn đề skill này giải quyết là gì?
+      placeholder: "Mô tả tình huống cụ thể khi bạn cần skill này"
+    validations:
+      required: true
+
+  - type: textarea
+    id: similar
+    attributes:
+      label: Skill tương tự đã tồn tại chưa?
+      description: Đã tìm trong kho chưa? Skill mới này khác gì với skill hiện có?
+      placeholder: "Tôi đã kiểm tra /dsg và không thấy skill nào bao phủ trường hợp này vì..."

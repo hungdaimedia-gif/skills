@@ -1,2 +1,7 @@
 node_modules
 .claude
+.skill-cache/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store

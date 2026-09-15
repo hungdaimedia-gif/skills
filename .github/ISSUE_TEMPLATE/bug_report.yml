@@ -1,0 +1,53 @@
+name: Bug Report / Báo lỗi Skill
+description: Báo cáo skill hoạt động không đúng
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: skill-name
+    attributes:
+      label: Skill bị lỗi
+      description: Tên skill gặp vấn đề
+      options:
+        - dsg
+        - tdd
+        - code-review
+        - diagnosing-bugs
+        - grill-with-docs
+        - implement
+        - codebase-design
+        - agent-disorientation-recovery
+        - novel-world-building
+        - financial-statement-analyzer
+        - midjourney-prompt-architect
+        - other (ghi ở phần mô tả)
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: Chuyện gì đã xảy ra?
+      description: Mô tả hành vi sai của skill
+      placeholder: "Ví dụ: /dsg không nhận diện được domain finance, luôn routing sang engineering"
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Kỳ vọng là gì?
+      placeholder: "Ví dụ: Khi tôi hỏi về phân tích BCTC, /dsg nên kích hoạt financial-statement-analyzer"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: ai-agent
+    attributes:
+      label: AI Agent đang dùng
+      options:
+        - Antigravity IDE
+        - Claude Code
+        - Codex
+        - Other
+    validations:
+      required: true

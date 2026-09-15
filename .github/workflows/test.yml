@@ -1,0 +1,49 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Python Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install pyyaml
+
+      - name: Run test suite
+        run: python3 tests/test_pipeline.py
+
+      - name: Validate SKILL_STANDARDS format
+        run: |
+          python3 -c "
+          import os, re, sys
+          skills_dir = 'skills'
+          failures = []
+          for root, dirs, files in os.walk(skills_dir):
+              dirs[:] = [d for d in dirs if d not in ('deprecated', 'node_modules')]
+              if 'SKILL.md' in files:
+                  path = os.path.join(root, 'SKILL.md')
+                  content = open(path).read()
+                  name = os.path.basename(root)
+                  if not re.search(r'^name:', content, re.MULTILINE):
+                      failures.append(f'MISSING name: {path}')
+                  if not re.search(r'^description:', content, re.MULTILINE):
+                      failures.append(f'MISSING description: {path}')
+          if failures:
+              print('SKILL FORMAT FAILURES:')
+              for f in failures: print(f'  - {f}')
+              sys.exit(1)
+          else:
+              print(f'All SKILL.md files have required frontmatter.')
+          "

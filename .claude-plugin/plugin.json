@@ -1,13 +1,13 @@
 {
-  "name": "mattpocock-skills",
-  "version": "1.2.3",
-  "description": "Matt Pocock's agent skills for real engineering: grilling, spec/ticket flows, TDD, code review, domain modelling and more. Plug-and-play, not vibe coding.",
+  "name": "hungdaimedia-skills",
+  "version": "2.0.0",
+  "description": "53 agent skills for real engineering, creative writing, AI art, and finance analysis. Includes /dsg auto-dispatcher, bilingual Vietnamese explanations, conflict arbitration, and user-controlled loop budget. Extended from Matt Pocock's original skills.",
   "author": {
-    "name": "Matt Pocock",
-    "url": "https://www.aihero.dev"
+    "name": "hungdaimedia",
+    "url": "https://github.com/hungdaimedia-gif"
   },
-  "homepage": "https://www.aihero.dev/s/skills-newsletter",
-  "repository": "https://github.com/mattpocock/skills",
+  "homepage": "https://github.com/hungdaimedia-gif/skills",
+  "repository": "https://github.com/hungdaimedia-gif/skills",
   "license": "MIT",
   "keywords": [
     "engineering",
@@ -16,7 +16,12 @@
     "code-review",
     "grilling",
     "domain-modeling",
-    "productivity"
+    "productivity",
+    "dsg",
+    "vietnamese",
+    "creative-writing",
+    "finance",
+    "midjourney"
   ],
   "skills": [
     "./skills/engineering/ask-matt",
@@ -55,6 +60,12 @@
     "./skills/productivity/teach",
     "./skills/productivity/to-questionnaire",
     "./skills/productivity/wait-what",
-    "./skills/productivity/writing-for-agents"
+    "./skills/productivity/writing-for-agents",
+    "./skills/writing/novel-world-building",
+    "./skills/writing/story-character-arc",
+    "./skills/art/midjourney-prompt-architect",
+    "./skills/finance/financial-statement-analyzer",
+    "./skills/misc/git-guardrails-claude-code",
+    "./skills/misc/setup-pre-commit"
   ]
 }

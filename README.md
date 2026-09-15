@@ -18,13 +18,40 @@ Developing real applications is hard. Approaches like GSD, BMAD, and Spec-Kit tr
 
 These skills are designed to be small, easy to adapt, and composable. They work with any model. They're based on decades of engineering experience. Hack around with them. Make them your own. Enjoy.
 
-If you want to keep up with changes to these skills, and any new ones I create, you can join ~60,000 other devs on my newsletter:
+---
 
-[Sign Up To The Newsletter](https://www.aihero.dev/s/skills-newsletter)
+## 🇻🇳 Cài Đặt & Sử Dụng (Tiếng Việt)
+
+> Kho này chứa **53 skills đa lĩnh vực** (Lập trình, Sáng tác, Tranh AI, Tài chính) và dispatcher `/dsg` giúp bạn không cần nhớ tên skill tiếng Anh.
+>
+> **Xem hướng dẫn đầy đủ**: [INSTALL.md](./INSTALL.md)
+
+### Cài nhanh 3 bước:
+
+```bash
+# 1. Clone về máy
+git clone git@github.com:hungdaimedia-gif/skills.git ~/Projects/skills
+
+# 2. Cài vào toàn máy (tất cả dự án đều dùng được ngay)
+bash ~/Projects/skills/scripts/link-skills.sh
+
+# 3. Mở Web Hub tra cứu 53 skills trực quan
+python3 -m http.server 3333 --directory ~/Projects/skills/web &
+open http://localhost:3333
+```
+
+Sau bước 2, trong bất kỳ dự án nào, chỉ cần gõ vào AI Agent:
+- **`/dsg`** — Tự động chẩn đoán & chọn skill phù hợp
+- **`/tdd`** — Vòng lặp TDD đỏ-xanh-tối ưu
+- **`/code-review`** — Rà soát code trước commit
+- **`/grill-with-docs`** — Làm rõ yêu cầu trước khi code
+
+---
 
 ## Installation (30-second setup)
 
 Two ways in, two philosophies. **The [Claude Code plugin](https://code.claude.com/docs/en/plugins)** installs the whole set as a managed, read-only bundle that updates when I ship, so you subscribe rather than fork. **[skills.sh](https://skills.sh/mattpocock/skills)** copies editable skill files into your project, so you can hack on them and make them your own. Pick one: installing both leaves you with every skill twice.
+
 
 ### 1. Get the skills
 

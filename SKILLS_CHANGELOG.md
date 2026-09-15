@@ -10,7 +10,7 @@ Hệ thống skills đã được nâng cấp toàn diện từ trạng thái **
 
 ## 1. ĐỒNG BỘ 2 CHIỀU GIỮA 2 KHO DỰ ÁN
 * **Kho nguồn 1**: `git@github.com:hungdaimedia-gif/idea-agent-loop-blueprint.git`
-* **Kho nguồn 2**: `git@github.com:hungdaimedia-gif/skills.git` (đã clone về `/Users/macos/Projects/skills`)
+* **Kho nguồn 2**: `git@github.com:hungdaimedia-gif/skills.git` (đã clone về `~/Projects/skills`)
 
 ### Chiều đi (Từ Blueprint sang Skills Repo):
 Đã chuyển thành công **11 skills thực chiến** vào thư mục `skills/engineering/`:

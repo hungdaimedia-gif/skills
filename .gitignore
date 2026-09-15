@@ -5,3 +5,15 @@ __pycache__/
 *.pyc
 *.pyo
 .DS_Store
+
+# Secrets and environment variables
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.cert
+id_rsa*
+id_ed25519*
+secrets.yml
+credentials.json

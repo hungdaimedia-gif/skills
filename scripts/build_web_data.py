@@ -2,8 +2,9 @@ import os
 import re
 import json
 
-skills_dir = "/Users/macos/Projects/skills/skills"
-output_web_dir = "/Users/macos/Projects/skills/web"
+REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+skills_dir = os.path.join(REPO_ROOT, "skills")
+output_web_dir = os.path.join(REPO_ROOT, "web")
 os.makedirs(output_web_dir, exist_ok=True)
 
 skills = []

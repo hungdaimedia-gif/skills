@@ -312,11 +312,11 @@ export NVM_DIR="$HOME/.nvm" && [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 ## ✅ Checklist hoàn thành
 
 ```
-[x] uv cài thành công (/Users/macos/.local/bin/uv)
+[x] uv cài thành công (~/.local/bin/uv)
 [x] Python 3.10.21 virtual env tại ~/agent-team/agentenv
 [x] 157 packages cài thành công (crewai, litellm, crewai-tools...)
 [x] SSH key ed25519 tạo tại ~/.ssh/id_ed25519
-[x] SSH key thêm vào GitHub (SHA256:NrmoNgmjktziHl4lOzsgKZ5Lax40j9mZDlplssmPsIs)
+[x] SSH key thêm vào GitHub
 [x] Repo idea-agent-loop-blueprint clone thành công
 [x] nvm + Node.js v26.8.2 cài thành công
 [x] Agent Loop Blueprint setup: 14 file cốt lõi + 8 skills

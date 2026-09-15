@@ -425,7 +425,7 @@ def process_repo(source, global_conflict, dry_run):
 
     if dry_run:
         print(f"  [DRY-RUN] Sẽ clone từ: https://github.com/{repo}.git")
-        return 0, 0
+        return 0, 0, 0
 
     # Tìm và nạp tất cả skills
     skill_paths = find_all_skills(cache_path, skills_dir)
@@ -458,31 +458,108 @@ def rebuild_hub():
         print(f"⚠️  Lỗi khi rebuild: {e}")
 
 
+PROFILES_DIR = os.path.join(REPO_ROOT, "profiles")
+
+
+def load_profile(profile_name):
+    """Tải profile YAML cho dự án. Trả về dict hoặc None nếu không có."""
+    profile_path = os.path.join(PROFILES_DIR, f"{profile_name}.yml")
+    if not os.path.exists(profile_path):
+        print(f"❌ Không tìm thấy profile: {profile_path}")
+        print(f"   Tạo profile mới: cp profiles/template.yml profiles/{profile_name}.yml")
+        sys.exit(1)
+    with open(profile_path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
+
+
+def list_profiles():
+    """Liệt kê tất cả profiles có sẵn."""
+    if not os.path.isdir(PROFILES_DIR):
+        return []
+    return [
+        f.replace(".yml", "")
+        for f in os.listdir(PROFILES_DIR)
+        if f.endswith(".yml") and f != "template.yml"
+    ]
+
+
+def apply_profile_filter(skills_dir_path, profile):
+    """Kiểm tra skill có được phép trong profile này không."""
+    if not profile:
+        return True
+    active_domains = set(profile.get("active_domains", list(DOMAIN_MAP.keys())))
+    exclude_skills = set(profile.get("exclude_skills", []))
+    include_tags = profile.get("include_tags", [])
+
+    # Lấy domain từ đường dẫn: skills/<domain>/<skill-name>
+    rel = os.path.relpath(skills_dir_path, SKILLS_DIR)
+    parts = rel.split(os.sep)
+    skill_domain = parts[0] if parts else "engineering"
+    skill_name = parts[-1] if len(parts) > 1 else ""
+
+    if skill_domain not in active_domains:
+        return False
+    if skill_name in exclude_skills:
+        return False
+    # include_tags filtering sẽ mở rộng sau khi có tag metadata
+    return True
+
+
 def main():
     parser = argparse.ArgumentParser(description="Auto Skill Pipeline — Nạp skills từ nhiều GitHub repos")
     parser.add_argument("--dry-run", action="store_true", help="Preview, không thay đổi gì")
     parser.add_argument("--repo", help="Chỉ xử lý repo cụ thể (format: owner/repo)")
     parser.add_argument("--conflict", choices=["skip", "override", "merge"],
                         help="Ghi đè policy xung đột toàn cục")
+    parser.add_argument("--profile", help="Tên project profile (vd: hungdaitool, my-project)")
+    parser.add_argument("--list-profiles", action="store_true", help="Liệt kê tất cả profiles có sẵn")
     args = parser.parse_args()
 
-    if not os.path.exists(SOURCES_FILE):
-        print(f"❌ Không tìm thấy {SOURCES_FILE}")
-        print("Chạy script từ thư mục gốc của repo.")
+    # === LIST PROFILES ===
+    if args.list_profiles:
+        profiles = list_profiles()
+        print("📂 Profiles có sẵn:")
+        for p in profiles:
+            profile_path = os.path.join(PROFILES_DIR, f"{p}.yml")
+            data = yaml.safe_load(open(profile_path))
+            desc = data.get("profile", {}).get("description", "")
+            print(f"   • {p:20s} — {desc}")
+        print("\nDùng: python3 scripts/auto_get_skills.py --profile <tên>")
+        sys.exit(0)
+
+    # === LOAD PROFILE ===
+    profile = None
+    quality_threshold = 70  # default
+    if args.profile:
+        profile = load_profile(args.profile)
+        quality_threshold = profile.get("quality_threshold", 70)
+        prof_meta = profile.get("profile", {})
+        print(f"🎯 PROFILE: {prof_meta.get('name', args.profile)}")
+        print(f"   {prof_meta.get('description', '')}")
+        print(f"   Domains: {', '.join(profile.get('active_domains', ['all']))}")
+        print(f"   Quality threshold: {quality_threshold}/100")
+
+    # === LOAD SOURCES ===
+    # Profile có sources riêng → dùng; không có → dùng sources.yml toàn cục
+    if profile and profile.get("sources"):
+        sources = profile["sources"]
+        print(f"   Sources: từ profile ({len(sources)} repos)")
+    elif os.path.exists(SOURCES_FILE):
+        with open(SOURCES_FILE, "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f)
+        sources = config.get("sources", [])
+        print(f"   Sources: từ sources.yml ({len(sources)} repos)")
+    else:
+        print(f"❌ Không tìm thấy sources.yml và profile không có sources riêng")
         sys.exit(1)
 
-    with open(SOURCES_FILE, "r", encoding="utf-8") as f:
-        config = yaml.safe_load(f)
-
-    sources = config.get("sources", [])
     if args.repo:
         sources = [s for s in sources if s.get("repo") == args.repo]
         if not sources:
-            print(f"❌ Không tìm thấy repo '{args.repo}' trong sources.yml")
+            print(f"❌ Không tìm thấy repo '{args.repo}'")
             sys.exit(1)
 
-    print("🚀 AUTO SKILL PIPELINE")
-    print(f"   Nguồn: {SOURCES_FILE}")
+    print(f"\n🚀 AUTO SKILL PIPELINE")
     print(f"   Repos: {len(sources)}")
     if args.dry_run:
         print("   [CHẾ ĐỘ DRY-RUN — Không thay đổi thực tế]")

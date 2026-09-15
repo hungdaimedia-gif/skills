@@ -1,0 +1,38 @@
+# TEMPLATE — Sao chép và chỉnh sửa cho dự án mới
+# Lưu tại: profiles/<tên-dự-án>.yml
+# Dùng: python3 scripts/auto_get_skills.py --profile <tên-dự-án>
+
+profile:
+  name: my-project                    # ← Thay tên dự án
+  description: "Mô tả ngắn dự án"    # ← Mô tả
+  owner: github-username              # ← GitHub owner
+  version: "1.0"
+
+# Domain được kích hoạt — chọn chỉ những gì dự án cần
+active_domains:
+  - engineering     # Code, test, review, debug
+  # - writing       # Novel, story, creative
+  # - art           # Midjourney, visual prompt
+  # - finance       # BCTC, cash flow
+  # - productivity  # Handoff, grill, questionnaire
+  # - misc          # Tiện ích chung
+
+# Bộ lọc skill
+include_tags: []          # [] = lấy tất cả; ["tdd", "review"] = chỉ lấy skill có tag này
+exclude_skills: []        # Tên skill cụ thể muốn loại khỏi profile này
+
+# Nguồn GitHub riêng cho dự án này
+sources:
+  - repo: "owner/repo"
+    branch: "main"
+    domain: "engineering"
+    conflict: "skip"
+
+# Ngưỡng chất lượng (0-100, mặc định 70)
+quality_threshold: 70
+
+# Thư mục đích khi link skills (null = dùng mặc định)
+# Ghi đè nếu muốn link sang thư mục dự án cụ thể:
+# link_targets:
+#   - "~/Projects/my-project/.agents/skills"
+link_targets: null

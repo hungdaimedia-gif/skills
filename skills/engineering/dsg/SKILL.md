@@ -99,6 +99,24 @@ Khi bạn muốn thêm skill từ một repository GitHub khác vào kho:
 
 ---
 
+## 🛑 QUY TẮC CHỐNG VÒNG LẶP VÔ TẬN (ANTI-LOOP CIRCUIT BREAKER)
+
+Để ngăn chặn tuyệt đối tình trạng Agent rơi vào vòng xoáy tự vấn hoặc lặp vô tận (Agent Infinite Loop):
+
+1. **Cấm gọi đệ quy (Non-Recursive)**:
+   - `/dsg` là Bàn xoay 1 chiều (Single-Hop Dispatcher). Sau khi định tuyến sang skill mục tiêu, `/dsg` kết thúc vai trò.
+   - Skill con tuyệt đối KHÔNG được phép gọi ngược lại `/dsg`.
+
+2. **Điểm dừng bắt buộc (Hard Terminal State)**:
+   - Mỗi skill sau khi hoàn thành nhiệm vụ (ví dụ: xuất xong `SPEC.md`, viết xong test TDD, xuất báo cáo review) phải **DỪNG LẠI NGAY LẬP TỨC** và trả quyền kiểm soát về cho người dùng.
+   - Không tự ý sinh ra các chuỗi phân tích lan man tiếp theo nếu không có yêu cầu mới từ người dùng.
+
+3. **Ngắt mạch khẩn cấp (Circuit Breaker - Quy tắc 2 lần thất bại)**:
+   - Nếu một tác vụ sửa lỗi chạy 2 lần liên tiếp không thành công, Agent **CẤM KHÔNG ĐƯỢC** tiếp tục đoán mò hoặc tự sửa lần 3.
+   - Phải lập tức dừng lại, kích hoạt quy trình dừng an toàn `agent-disorientation-recovery`, xuất trình chẩn đoán cho con người duyệt.
+
+---
+
 ## 📋 MẪU THỰC TẾ MINH HOẠ KHI CHẠY /dsg
 
 ### Ví dụ: Khi bạn sửa file dài 600 dòng và bắt đầu thấy rối

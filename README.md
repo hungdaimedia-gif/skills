@@ -212,6 +212,17 @@ Skills I use daily for code work.
 - **[code-review](./skills/engineering/code-review/SKILL.md)**: Two-axis review of the diff since a fixed point: **Standards** (does it follow the repo's coding standards, plus a Fowler smell baseline?) and **Spec** (does it faithfully implement the originating issue/spec?), run as parallel sub-agents so neither pollutes the other.
 - **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)**: Work through an in-progress git merge or rebase conflict hunk by hunk, resolving by intent traced to each side's primary source, then finish the operation (never `--abort`).
 - **[wizard](./skills/engineering/wizard/SKILL.md)**: Generate an interactive bash wizard that walks a human through steps only they can perform: provisioning infrastructure, setting up credentials or CI secrets, walking an unfamiliar third-party dashboard, or running a one-off migration or cutover.
+- **[agent-disorientation-recovery](./skills/engineering/agent-disorientation-recovery/SKILL.md)**: Recovery protocols when agent loses context, gets stuck in loops, or drifts from project requirements.
+- **[chrome-web-store-prep](./skills/engineering/chrome-web-store-prep/SKILL.md)**: Prepare Chrome Extension MV3 assets, manifest, permissions justification, and privacy policy for store review.
+- **[claude-task-runner](./skills/engineering/claude-task-runner/SKILL.md)**: Task runner and execution loop coordinator for Claude and agent automation workflows.
+- **[code-bug-inspector](./skills/engineering/code-bug-inspector/SKILL.md)**: Static inspection and automatic triage of syntax, type, import, and logic bugs with Python inspector.
+- **[codebase-line-budget-guard](./skills/engineering/codebase-line-budget-guard/SKILL.md)**: Track and enforce line count budgets and modularity limits across repository files.
+- **[fullstack-boilerplate-architect](./skills/engineering/fullstack-boilerplate-architect/SKILL.md)**: Architect and scaffold clean, production-ready fullstack project boilerplates.
+- **[macos-m1-multiagent-setup](./skills/engineering/macos-m1-multiagent-setup/SKILL.md)**: Setup, configure, and optimize local multi-agent environments on Apple Silicon macOS machines.
+- **[multiagent-setup-crossplatform](./skills/engineering/multiagent-setup-crossplatform/SKILL.md)**: Cross-platform multi-agent development setup across macOS, Linux, and Windows.
+- **[project-blueprint-loop-architect](./skills/engineering/project-blueprint-loop-architect/SKILL.md)**: Design project blueprints, state machine loops, and autonomous agent iteration cycles.
+- **[system-logs-and-diagnostics](./skills/engineering/system-logs-and-diagnostics/SKILL.md)**: System logs and diagnostic chains for Chrome Extension MV3 and complex apps.
+- **[workflow-node-studio](./skills/engineering/workflow-node-studio/SKILL.md)**: Canvas studio UI design and custom node development for React Flow workflows.
 
 ### Productivity
 

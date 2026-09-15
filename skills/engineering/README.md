@@ -30,3 +30,14 @@ Model- or user-reachable (rich trigger phrasing so the model can reach for them)
 - **[code-review](./code-review/SKILL.md)**: Two-axis review of the diff since a fixed point: **Standards** (does it follow the repo's coding standards, plus a Fowler smell baseline?) and **Spec** (does it faithfully implement the originating issue/spec?), run as parallel sub-agents.
 - **[resolving-merge-conflicts](./resolving-merge-conflicts/SKILL.md)**: Work through an in-progress git merge or rebase conflict hunk by hunk, resolving by intent traced to each side's primary source, then finish the operation, never `--abort`.
 - **[wizard](./wizard/SKILL.md)**: Generate an interactive bash wizard that walks a human through steps only they can perform: provisioning infrastructure, setting up credentials or CI secrets, walking an unfamiliar third-party dashboard, or running a one-off migration or cutover.
+- **[agent-disorientation-recovery](./agent-disorientation-recovery/SKILL.md)**: Recovery protocols when agent loses context, gets stuck in loops, or drifts from project requirements.
+- **[chrome-web-store-prep](./chrome-web-store-prep/SKILL.md)**: Prepare Chrome Extension MV3 assets, manifest, permissions justification, and privacy policy for store review.
+- **[claude-task-runner](./claude-task-runner/SKILL.md)**: Task runner and execution loop coordinator for Claude and agent automation workflows.
+- **[code-bug-inspector](./code-bug-inspector/SKILL.md)**: Static inspection and automatic triage of syntax, type, import, and logic bugs with Python inspector.
+- **[codebase-line-budget-guard](./codebase-line-budget-guard/SKILL.md)**: Track and enforce line count budgets and modularity limits across repository files.
+- **[fullstack-boilerplate-architect](./fullstack-boilerplate-architect/SKILL.md)**: Architect and scaffold clean, production-ready fullstack project boilerplates.
+- **[macos-m1-multiagent-setup](./macos-m1-multiagent-setup/SKILL.md)**: Setup, configure, and optimize local multi-agent environments on Apple Silicon macOS machines.
+- **[multiagent-setup-crossplatform](./multiagent-setup-crossplatform/SKILL.md)**: Cross-platform multi-agent development setup across macOS, Linux, and Windows.
+- **[project-blueprint-loop-architect](./project-blueprint-loop-architect/SKILL.md)**: Design project blueprints, state machine loops, and autonomous agent iteration cycles.
+- **[system-logs-and-diagnostics](./system-logs-and-diagnostics/SKILL.md)**: System logs and diagnostic chains for Chrome Extension MV3 and complex apps.
+- **[workflow-node-studio](./workflow-node-studio/SKILL.md)**: Canvas studio UI design and custom node development for React Flow workflows.

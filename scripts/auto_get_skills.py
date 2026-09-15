@@ -75,6 +75,77 @@ def detect_domain(name, content, hint=None):
     return "engineering"
 
 
+# ===== QUALITY GATE CONSTANTS =====
+DANGER_PATTERNS = [
+    r"skip\s+(tests?|tdd)",
+    r"git push\s+--force",
+    r"no need\s+(for\s+)?(human|review|test)",
+    r"always correct",
+    r"bỏ qua test",
+]
+WHEN_KEYWORDS = ["when", "use when", "trigger", "activate", "khi nào"]
+WHAT_KEYWORDS = ["what", "purpose", "goal", "how to", "làm gì", "mục đích"]
+STEP_KEYWORDS = ["step", "phase", "bước", "process", "workflow", "protocol", "## "]
+
+
+def validate_skill(skill_name, content, domain):
+    """Chấm điểm skill theo 5 Quality Gates (0-100). Trả về (score, report)."""
+    report = {}
+    score = 0
+
+    # Gate 1: Cấu trúc (20đ)
+    has_name = bool(re.search(r"^name:\s*\S+", content, re.MULTILINE))
+    has_desc = bool(re.search(r"^description:\s*.{20,200}", content, re.MULTILINE))
+    name_valid = bool(re.match(r"^[a-z0-9\-]+$", skill_name))
+    g1 = 20 if (has_name and has_desc and name_valid) else (10 if (has_name or has_desc) else 0)
+    report["gate1_structure"] = {"score": g1, "max": 20,
+                                  "details": f"name={has_name} desc={has_desc} name_valid={name_valid}"}
+    score += g1
+
+    # Gate 2: Nội dung tối thiểu (30đ)
+    word_count = len(content.split())
+    text_lower = content.lower()
+    has_when = any(k in text_lower for k in WHEN_KEYWORDS)
+    has_what = any(k in text_lower for k in WHAT_KEYWORDS)
+    has_steps = any(k in text_lower for k in STEP_KEYWORDS)
+    answered = sum([has_when, has_what, has_steps])
+    if word_count >= 150 and answered >= 2:
+        g2 = 30
+    elif word_count >= 80 and answered >= 1:
+        g2 = 15
+    else:
+        g2 = 0
+    report["gate2_substance"] = {"score": g2, "max": 30,
+                                  "details": f"words={word_count} when={has_when} what={has_what} steps={has_steps}"}
+    score += g2
+
+    # Gate 3: Novelty — checked by collision detector, assume pass
+    report["gate3_novelty"] = {"score": 20, "max": 20, "details": "checked separately"}
+    score += 20
+
+    # Gate 4: Domain fit (15đ)
+    g4 = 15 if domain in DOMAIN_MAP else 0
+    report["gate4_domain"] = {"score": g4, "max": 15, "details": f"domain={domain}"}
+    score += g4
+
+    # Gate 5: Safety (15đ)
+    danger_hits = [p for p in DANGER_PATTERNS if re.search(p, text_lower)]
+    g5 = 0 if danger_hits else 15
+    report["gate5_safety"] = {"score": g5, "max": 15,
+                               "details": f"violations={'none' if not danger_hits else danger_hits}"}
+    score += g5
+
+    return score, report
+
+
+def print_quality_report(score, report):
+    status = "✅ PASS" if score >= 70 else "❌ REJECT"
+    print(f"     🔬 Quality Gate [{status}] — {score}/100 điểm")
+    for gate, data in report.items():
+        icon = "✅" if data["score"] == data["max"] else ("⚠️ " if data["score"] > 0 else "❌")
+        print(f"        {icon} {gate}: {data['score']}/{data['max']} — {data['details']}")
+
+
 def find_all_skills(repo_local_path, skills_dir_hint="skills"):
     """Quét repo và tìm tất cả thư mục chứa SKILL.md."""
     found = []
@@ -162,6 +233,13 @@ def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run):
     print(f"\n  📦 Skill: '{skill_name}'")
     print(f"     Domain: {domain} | Branch: {branch}")
 
+    # ===== QUALITY GATE CHECK =====
+    score, report = validate_skill(skill_name, content, domain)
+    print_quality_report(score, report)
+    if score < 70:
+        print(f"  🚫 REJECTED: Điểm {score}/100 thấp hơn ngưỡng 70 — Xem SKILL_STANDARDS.md để biết thêm.")
+        return False
+
     # Kiểm tra xung đột
     existing = check_collision(skill_name)
     if existing:
@@ -171,6 +249,7 @@ def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run):
             return False
         if result == "merged":
             return True
+
 
     # Sao chép vào thư mục đích
     dest_dir = os.path.join(SKILLS_DIR, domain, skill_name)

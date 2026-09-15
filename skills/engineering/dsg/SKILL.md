@@ -101,28 +101,95 @@ Khi bạn muốn thêm skill từ một repository GitHub khác vào kho:
 
 ## 🛑 QUY TẮC CHỐNG VÒNG LẶP VÔ TẬN (ANTI-LOOP CIRCUIT BREAKER)
 
-Để ngăn chặn tuyệt đối tình trạng Agent rơi vào vòng xoáy tự vấn hoặc lặp vô tận (Agent Infinite Loop):
+### Nguyên tắc cốt lõi: Ngân Sách Vòng Lặp Do Người Dùng Kiểm Soát
+
+Tuyệt đối cấm Agent tự định quyết chạy bao nhiêu vòng. Chính người dùng là người cấp phép (authorize) cho mỗi lô vòng lặp tiếp theo.
+
+**Cơ chế hoạt động theo 3 tầng:**
 
 1. **Cấm gọi đệ quy (Non-Recursive)**:
    - `/dsg` là Bàn xoay 1 chiều (Single-Hop Dispatcher). Sau khi định tuyến sang skill mục tiêu, `/dsg` kết thúc vai trò.
    - Skill con tuyệt đối KHÔNG được phép gọi ngược lại `/dsg`.
 
 2. **Điểm dừng bắt buộc (Hard Terminal State)**:
-   - Mỗi skill sau khi hoàn thành nhiệm vụ (ví dụ: xuất xong `SPEC.md`, viết xong test TDD, xuất báo cáo review) phải **DỪNG LẠI NGAY LẬP TỨC** và trả quyền kiểm soát về cho người dùng.
-   - Không tự ý sinh ra các chuỗi phân tích lan man tiếp theo nếu không có yêu cầu mới từ người dùng.
+   - Sau mỗi lần thực thi, Agent phải **DỪNG** và báo cáo kết quả. Không tự động chạy vòng tiếp theo khi chưa có phép của người dùng.
 
-3. **Ngắt mạch khẩn cấp (Circuit Breaker - Quy tắc 2 lần thất bại)**:
-   - Nếu một tác vụ sửa lỗi chạy 2 lần liên tiếp không thành công, Agent **CẤM KHÔNG ĐƯỢC** tiếp tục đoán mò hoặc tự sửa lần 3.
-   - Phải lập tức dừng lại, kích hoạt quy trình dừng an toàn `agent-disorientation-recovery`, xuất trình chẩn đoán cho con người duyệt.
+3. **Giao Thức Xin Phép Khi Chạm Ngưỡng (Loop Budget Gate)**:
+   - Mặc định Agent được phép tự thử **2 lần** (gọi là "Ngân sách mặc định").
+   - Sau lần thứ 2 thất bại, Agent **bắt buộc dừng lại và hỏi user theo mẫu sau:**
 
 ---
 
-## 📋 MẪU THỰC TẾ MINH HOẠ KHI CHẠY /dsg
+### 📋 MẪU HỎI XIN PHÉP BẮT BUỘC (Loop Budget Request)
 
-### Ví dụ: Khi bạn sửa file dài 600 dòng và bắt đầu thấy rối
-> **Bạn**: `/dsg`  
-> **Agent phản hồi**:  
-> "🔍 **Chẩn đoán**: File `WorkflowCanvas.jsx` đã đạt 640 dòng, chứa lẫn lộn cả state kéo thả node và API call. Đây là nguyên nhân khiến agent trước đó sửa một chỗ lại hỏng chỗ khác.  
-> ⚡ **Skill tự kích hoạt**: `codebase-line-budget-guard` + `codebase-design` (Bảo vệ ngân sách dòng & Thiết kế Deep Module).  
-> 💡 **Phân tích kỹ**: Cần phải tách `useNodeDrag` và `useWorkflowApi` thành 2 module độc lập trước khi thêm tính năng mới, nếu không file sẽ vượt ngưỡng 1,000 dòng và tê liệt.  
-> 🚀 **Thực thi ngay**: Tôi đang tiến hành cô lập và tách hook đầu tiên..."
+Khi đã tiêu hết ngân sách vòng lặp mặc định (sau 2 lần thất bại), Agent **bắt buộc** xuất trình đúng mẫu này trước khi làm bất kỳ điều gì tiếp theo:
+
+```
+🛑 Đã thử 2 lần nhưng chưa xong. Dừng lại để xin hướng dẫn tiếp.
+
+📊 TÓM TẮT 2 VÒNG VỪA CHẠY:
+- Lần 1: [Thử cách gì] → [Kết quả / Lỗi gì xuất hiện]
+- Lần 2: [Thử cách gì] → [Kết quả / Lỗi gì còn sót lại]
+
+🔍 PHÂN TÍCH: [Giải thích bằng 1-2 câu tại sao 2 cách trên đều chưa giải quyết được gốc rễ]
+
+⚡ CÁC HƯỚNG TIẾP THEO KHẢ THI (do Skill gợi ý):
+→ Hướng A [do skill `diagnosing-bugs` gợi ý]: [Mô tả cách tiếp cận A]
+→ Hướng B [do skill `codebase-design` gợi ý]:  [Mô tả cách tiếp cận B, ví dụ: tái cấu trúc module trước]
+→ Hướng C: Dừng hẳn — bạn tự quyết định cách khác
+
+❓ BẠN MUỐN:
+  [1] Cho phép Agent tiếp tục Hướng A (+ bạn cấp thêm __ vòng lặp nữa)
+  [2] Cho phép Agent tiếp tục Hướng B (+ bạn cấp thêm __ vòng lặp nữa)
+  [3] Dừng lại — bạn sẽ chỉ định hướng khác
+```
+
+**Quy tắc bắt buộc khi người dùng trả lời:**
+- Nếu user chọn Hướng A hoặc B và cấp X vòng: Agent được phép tự chạy X vòng đó rồi **lại phải dừng báo cáo**, không được dùng nhiều hơn số vòng được phép.
+- Nếu user không chỉ định số vòng cụ thể: Agent chỉ được chạy đúng **1 vòng** rồi dừng lại hỏi tiếp.
+
+---
+
+## 📋 MẪU THỰC TẾ MINH HỌA ĐẦY ĐỦ KHI CHẠY /dsg
+
+### Ví dụ 1: Scan nhanh + định tuyến thành công (Trường hợp bình thường)
+
+> **Bạn**: `/dsg`
+> **Agent phản hồi**:
+> "🔍 **Chẩn đoán**: File `WorkflowCanvas.jsx` đã đạt 640 dòng, chứa lẫn lộn cả state kéo thả node và API call. Đây là nguyên nhân khiến agent trước đó sửa một chỗ lại hỏng chỗ khác.
+> ⚡ **Skill tự kích hoạt**: `codebase-line-budget-guard` + `codebase-design`.
+> 💡 **Phân tích kỹ**: Cần tách `useNodeDrag` và `useWorkflowApi` thành 2 module độc lập.
+> 🚀 **Thực thi (Vòng 1/2)**: Đang tiến hành cô lập và tách hook đầu tiên..."
+
+---
+
+### Ví dụ 2: Chạm ngưỡng 2 vòng — Hỏi xin phép tiếp
+
+> **Bạn**: `/dsg fix lỗi auth token bị expire`
+>
+> **Agent [Vòng 1]**: Thử set lại `expires_in` header — test vẫn đỏ.
+>
+> **Agent [Vòng 2]**: Thử refresh token logic — race condition vẫn xuất hiện.
+>
+> **Agent [Dừng bắt buộc - Hỏi user]**:
+>
+> ```
+> 🛑 Đã thử 2 lần nhưng chưa xong.
+>
+> 📊 TÓM TẮT:
+> - Lần 1: Set lại expires_in → Test đỏ tại test_auth.py:L47 (vẫn 401)
+> - Lần 2: Refresh token logic → Race condition: token bị overwrite trước khi API nhận
+>
+> 🔍 PHÂN TÍCH: Gốc rễ không phải ở header hay refresh — mà ở shared state
+>   giữa 2 async call đang ghi đè nhau lên cùng 1 biến token.
+>
+> ⚡ HƯỚNG TIẾP THEO KHẢ THI:
+> → Hướng A [diagnosing-bugs]: Thêm lock/mutex quanh token store — loại bỏ race condition
+> → Hướng B [codebase-design]: Tách AuthStore thành singleton isolate — giải quyết từ kiến trúc
+> → Hướng C: Dừng — bạn tự quyết
+>
+> ❓ Bạn muốn:
+>   [1] Hướng A — thêm lock (cấp thêm vòng lặp: ___ ?)
+>   [2] Hướng B — refactor AuthStore (cấp thêm vòng lặp: ___ ?)
+>   [3] Dừng
+> ```

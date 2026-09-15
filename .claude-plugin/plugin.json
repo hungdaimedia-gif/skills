@@ -1,6 +1,6 @@
 {
   "name": "hungdaimedia-skills",
-  "version": "2.0.0",
+  "version": "1.2.4",
   "description": "53 agent skills for real engineering, creative writing, AI art, and finance analysis. Includes /dsg auto-dispatcher, bilingual Vietnamese explanations, conflict arbitration, and user-controlled loop budget. Extended from Matt Pocock's original skills.",
   "author": {
     "name": "hungdaimedia",

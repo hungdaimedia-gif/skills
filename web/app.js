@@ -253,16 +253,77 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // 5.5 DYNAMIC BRANCH CONFIGURATION BY DOMAIN
+  const domainBranchesConfig = {
+    'all': [
+      { id: 'all', label: 'Tất cả' },
+      { id: '💡 Ý tưởng & Đặc tả', label: '💡 Ý tưởng & Spec' },
+      { id: '🏗️ Kiến trúc & Thiết kế', label: '🏗️ Kiến trúc' },
+      { id: '⚡ Viết Code & TDD', label: '⚡ Code & TDD' },
+      { id: '🛡️ Kiểm soát & Review', label: '🛡️ Review & Guard' },
+      { id: '🩺 Cứu hộ & Gỡ lỗi', label: '🩺 Cứu hộ & Debug' },
+      { id: '🚀 Nền tảng & Vận hành', label: '🚀 Nền tảng' },
+      { id: '📖 Cốt truyện & Thế giới', label: '📖 Viết truyện' },
+      { id: '🎨 Prompt & Bố cục Thị giác', label: '🎨 Tranh AI' },
+      { id: '📊 Phân tích BCTC & Dòng tiền', label: '📊 Tài chính' }
+    ],
+    '💻 Lập trình & Kỹ thuật': [
+      { id: 'all', label: 'Tất cả Code' },
+      { id: '💡 Ý tưởng & Đặc tả', label: '💡 Ý tưởng & Spec' },
+      { id: '🏗️ Kiến trúc & Thiết kế', label: '🏗️ Kiến trúc' },
+      { id: '⚡ Viết Code & TDD', label: '⚡ Code & TDD' },
+      { id: '🛡️ Kiểm soát & Review', label: '🛡️ Review & Guard' },
+      { id: '🩺 Cứu hộ & Gỡ lỗi', label: '🩺 Cứu hộ & Debug' },
+      { id: '🚀 Nền tảng & Vận hành', label: '🚀 Nền tảng' }
+    ],
+    '✍️ Sáng tác & Viết truyện': [
+      { id: 'all', label: 'Tất cả Sáng tác' },
+      { id: '📖 Cốt truyện & Thế giới', label: '📖 Cốt truyện & Thế giới' },
+      { id: '🎭 Nhân vật & Tâm lý', label: '🎭 Nhân vật & Tâm lý' }
+    ],
+    '🎨 Đồ họa & Tranh AI': [
+      { id: 'all', label: 'Tất cả Đồ họa' },
+      { id: '🎨 Prompt & Bố cục Thị giác', label: '🎨 Prompt & Bố cục Thị giác' }
+    ],
+    '📈 Tài chính & Đầu tư': [
+      { id: 'all', label: 'Tất cả Tài chính' },
+      { id: '📊 Phân tích BCTC & Dòng tiền', label: '📊 Phân tích BCTC & Dòng tiền' }
+    ]
+  };
+
+  function renderBranchPills(domain) {
+    const branches = domainBranchesConfig[domain] || domainBranchesConfig['all'];
+    const domainPool = skillsData.filter(s => domain === 'all' || s.domain === domain);
+
+    categoryPills.innerHTML = branches.map(b => {
+      const count = b.id === 'all' 
+        ? domainPool.length 
+        : domainPool.filter(s => s.branch === b.id).length;
+      const isActive = selectedBranch === b.id;
+      return `
+        <button class="filter-pill ${isActive ? 'active' : ''}" data-branch="${b.id}">
+          ${b.label} (${count})
+        </button>
+      `;
+    }).join('');
+
+    categoryPills.querySelectorAll('.filter-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        categoryPills.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        selectedBranch = pill.getAttribute('data-branch') || 'all';
+        filterAndRenderSkills();
+      });
+    });
+  }
+
   // 6. FILTER AND RENDER SKILLS GRID
   function filterAndRenderSkills() {
     const q = searchQuery.toLowerCase().trim();
 
-    const filtered = skillsData.filter(s => {
-      // Domain filter
-      if (selectedDomain !== 'all' && s.domain !== selectedDomain) {
-        return false;
-      }
+    const domainPool = skillsData.filter(s => selectedDomain === 'all' || s.domain === selectedDomain);
 
+    const filtered = domainPool.filter(s => {
       // Branch filter
       if (selectedBranch !== 'all' && s.branch !== selectedBranch) {
         return false;
@@ -278,15 +339,17 @@ document.addEventListener('DOMContentLoaded', () => {
         const matchId = s.id.toLowerCase().includes(q);
         const matchDesc = s.description.toLowerCase().includes(q);
         const matchBranch = (s.branch || '').toLowerCase().includes(q);
+        const matchDomain = (s.domain || '').toLowerCase().includes(q);
         const matchViWhat = s.vi && s.vi.what ? s.vi.what.toLowerCase().includes(q) : false;
         const matchViWhen = s.vi && s.vi.when ? s.vi.when.toLowerCase().includes(q) : false;
-        if (!matchName && !matchId && !matchDesc && !matchBranch && !matchViWhat && !matchViWhen) return false;
+        if (!matchName && !matchId && !matchDesc && !matchBranch && !matchDomain && !matchViWhat && !matchViWhen) return false;
       }
 
       return true;
     });
 
-    skillsCountTag.textContent = `Đang hiển thị ${filtered.length} / ${skillsData.length} skills`;
+    const domainName = selectedDomain === 'all' ? 'Tất cả lĩnh vực' : selectedDomain;
+    skillsCountTag.textContent = `Đang hiển thị ${filtered.length} / ${domainPool.length} skills • ${domainName}`;
 
     if (filtered.length === 0) {
       skillsGrid.style.display = 'none';
@@ -298,13 +361,20 @@ document.addEventListener('DOMContentLoaded', () => {
       skillsGrid.innerHTML = filtered.map(s => {
         const triggerText = s.userInvoked ? `/${s.id}` : `Áp dụng skill ${s.id}`;
         const viWhat = s.vi && s.vi.what ? s.vi.what : s.description;
+        
+        let domainIcon = '💻 Code';
+        if ((s.domain || '').includes('Sáng tác')) domainIcon = '✍️ Truyện';
+        else if ((s.domain || '').includes('Đồ họa')) domainIcon = '🎨 Tranh AI';
+        else if ((s.domain || '').includes('Tài chính')) domainIcon = '📈 Tài chính';
+
         return `
           <div class="skill-card" data-skill-id="${s.id}">
             <div class="card-top">
               <div class="card-badges">
+                <span class="badge" style="background: rgba(255,255,255,0.08); color: #fff;">${domainIcon}</span>
                 <span class="badge badge-category">${s.branch}</span>
                 <span class="badge ${s.userInvoked ? 'badge-user-invoked' : 'badge-model-invoked'}">
-                  ${s.userInvoked ? '⚡ User-invoked' : '🤖 Model-invoked'}
+                  ${s.userInvoked ? '⚡ User' : '🤖 Model'}
                 </span>
               </div>
               <h3 class="card-title">${s.name}</h3>
@@ -442,22 +512,11 @@ document.addEventListener('DOMContentLoaded', () => {
         pill.classList.add('active');
         selectedDomain = pill.getAttribute('data-domain') || 'all';
         selectedBranch = 'all';
-        categoryPills.querySelectorAll('.filter-pill').forEach(p => {
-          p.classList.toggle('active', p.getAttribute('data-branch') === 'all');
-        });
+        renderBranchPills(selectedDomain);
         filterAndRenderSkills();
       });
     });
   }
-
-  categoryPills.querySelectorAll('.filter-pill').forEach(pill => {
-    pill.addEventListener('click', () => {
-      categoryPills.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
-      pill.classList.add('active');
-      selectedBranch = pill.getAttribute('data-branch') || 'all';
-      filterAndRenderSkills();
-    });
-  });
 
   checkboxUser.addEventListener('change', (e) => {
     filterUserInvoked = e.target.checked;
@@ -473,10 +532,14 @@ document.addEventListener('DOMContentLoaded', () => {
     searchInput.value = '';
     searchQuery = '';
     clearSearchBtn.style.display = 'none';
+    selectedDomain = 'all';
     selectedBranch = 'all';
-    categoryPills.querySelectorAll('.filter-pill').forEach(p => {
-      p.classList.toggle('active', p.getAttribute('data-branch') === 'all');
-    });
+    if (domainSwitcherPills) {
+      domainSwitcherPills.querySelectorAll('.domain-pill').forEach(p => {
+        p.classList.toggle('active', p.getAttribute('data-domain') === 'all');
+      });
+    }
+    renderBranchPills('all');
     checkboxUser.checked = true;
     checkboxModel.checked = true;
     filterUserInvoked = true;
@@ -496,5 +559,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // 9. INITIALIZE
   renderWorkflowDetail(activePhaseTab);
   renderScenarios();
+  renderBranchPills(selectedDomain);
   filterAndRenderSkills();
 });

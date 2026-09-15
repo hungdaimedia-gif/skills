@@ -29,8 +29,9 @@ Trước khi bốc skill, DSG tự động nhận biết Lĩnh Vực (Domain) c�
 - **✍️ Sáng tác truyện & Nội dung**: Tự động kích hoạt `novel-world-building`, `story-character-arc`, `writing-beats`.
 - **🎨 Đồ họa & Tranh AI**: Tự động kích hoạt `midjourney-prompt-architect`.
 - **📈 Tài chính & Đầu tư**: Tự động kích hoạt `financial-statement-analyzer`.
+- **🗣️ Năng suất & Cộng tác**: Áp dụng bảng Productivity dưới đây.
 
-Khi ở trong Domain Lập trình, phân loại chính xác tình trạng dự án:
+**Bảng định tuyến Domain Lập trình (6 nhánh):**
 
 | Tình Huống Thực Tế | Nút Thắt Nhận Diện | Chuỗi Skill Tự Động Kích Hoạt |
 | :--- | :--- | :--- |
@@ -39,6 +40,36 @@ Khi ở trong Domain Lập trình, phân loại chính xác tình trạng dự �
 | **C. Mã nguồn phình to / File nặng** | File > 300 dòng, nguy cơ nát code | `codebase-line-budget-guard` ➔ `codebase-design` |
 | **D. Code xong / Chuẩn bị Commit** | Cần rà soát chuẩn mực & logic | `code-review` ➔ `resolving-merge-conflicts` |
 | **E. Gặp lỗi / Bị lặp / Agent ngáo** | Lặp vòng xoáy, sửa mãi không xong | `agent-disorientation-recovery` ➔ `diagnosing-bugs` ➔ `code-bug-inspector` |
+| **F. Setup môi trường / Đóng gói** | Cần dựng hệ thống Multi-Agent hoặc Extension | `macos-m1-multiagent-setup` ➔ `wizard` ➔ `chrome-web-store-prep` |
+
+**Bảng định tuyến Domain Năng suất & Cộng tác:**
+
+| Tình Huống | Skill Kích Hoạt |
+| :--- | :--- |
+| Muốn stress-test kế hoạch / quyết định | `grilling` hoặc `grill-me` |
+| Cần tóm tắt & bàn giao công việc cho Agent khác | `handoff` |
+| Giải thích một khái niệm khó cho người mới | `teach` |
+| Cần đặt câu hỏi có cấu trúc cho khách hàng/user | `to-questionnaire` |
+| Agent bị rối sau khi context bị nén (compaction) | `wait-what` |
+| Soạn tài liệu hướng dẫn cho Agent AI đọc | `writing-for-agents` |
+
+**Bảng định tuyến Skills Tiện Ích (Misc):**
+
+| Tình Huống | Skill Kích Hoạt |
+| :--- | :--- |
+| Ngăn Git commit code vội ẩu | `git-guardrails-claude-code` |
+| Khởi tạo pre-commit hooks chuẩn | `setup-pre-commit` |
+| Tạo bài tập luyện tập từ codebase | `scaffold-exercises` |
+
+**Skills đang thử nghiệm (in-progress) -- Dùng thận trọng:**
+
+| Skill | Mục đích |
+| :--- | :--- |
+| `claude-handoff` | Bàn giao phiên làm việc giữa 2 model AI |
+| `implement-spec` | Implement trực tiếp từ file SPEC.md |
+| `loop-me` | Vòng lặp tự chỉnh (đang thử nghiệm) |
+| `retro` | Retrospective tự động sau sprint |
+| `writing-beats` | Cấu trúc nhịp kể chuyện |
 
 ---
 

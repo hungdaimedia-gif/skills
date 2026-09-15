@@ -119,9 +119,34 @@ def validate_skill(skill_name, content, domain):
                                   "details": f"words={word_count} when={has_when} what={has_what} steps={has_steps}"}
     score += g2
 
-    # Gate 3: Novelty — checked by collision detector, assume pass
-    report["gate3_novelty"] = {"score": 20, "max": 20, "details": "checked separately"}
-    score += 20
+    # Gate 3: Novelty — cross-check description vs ALL existing skills
+    # So sánh description của skill mới với description của tất cả skills đang có.
+    desc_m = re.search(r"^description:\s*(.+)", content, re.MULTILINE)
+    new_desc = desc_m.group(1).strip() if desc_m else ""
+    max_cross_sim = 0.0
+    if new_desc and len(new_desc) > 10:
+        for walk_root, walk_dirs, walk_files in os.walk(SKILLS_DIR):
+            walk_dirs[:] = [d for d in walk_dirs if d != "deprecated"]
+            if "SKILL.md" in walk_files:
+                try:
+                    with open(os.path.join(walk_root, "SKILL.md"), "r", encoding="utf-8", errors="ignore") as ef:
+                        ex_content = ef.read()
+                    ex_desc_m = re.search(r"^description:\s*(.+)", ex_content, re.MULTILINE)
+                    if ex_desc_m:
+                        sim = similarity_score(new_desc, ex_desc_m.group(1).strip())
+                        max_cross_sim = max(max_cross_sim, sim)
+                except Exception:
+                    pass
+    cross_pct = int(max_cross_sim * 100)
+    if max_cross_sim >= 0.80:
+        g3 = 0   # Quá giống description của skill đã có
+    elif max_cross_sim >= 0.60:
+        g3 = 10  # Cảnh báo có thể chồng chéo
+    else:
+        g3 = 20  # Thực sự mới
+    report["gate3_novelty"] = {"score": g3, "max": 20,
+                                "details": f"max_desc_similarity={cross_pct}% vs existing skills"}
+    score += g3
 
     # Gate 4: Domain fit (15đ)
     g4 = 15 if domain in DOMAIN_MAP else 0
@@ -170,8 +195,12 @@ def check_collision(skill_name):
 
 
 def similarity_score(text_a, text_b):
-    """Tính độ tương đồng nội dung 0.0 → 1.0."""
-    return difflib.SequenceMatcher(None, text_a[:500], text_b[:500]).ratio()
+    """Tính độ tương đồng nội dung 0.0 → 1.0.
+    BUG FIX: Dùng toàn bộ nội dung thay vì chỉ 500 ký tự đầu.
+    Để tránh O(n^2) với file rất lớn, giới hạn 3000 ký tự.
+    """
+    limit = 3000
+    return difflib.SequenceMatcher(None, text_a[:limit], text_b[:limit]).ratio()
 
 
 def resolve_conflict(skill_name, existing_path, new_skill_path, policy, dry_run):
@@ -238,18 +267,17 @@ def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run):
     print_quality_report(score, report)
     if score < 70:
         print(f"  🚫 REJECTED: Điểm {score}/100 thấp hơn ngưỡng 70 — Xem SKILL_STANDARDS.md để biết thêm.")
-        return False
+        return "rejected"
 
     # Kiểm tra xung đột
     existing = check_collision(skill_name)
     if existing:
         print(f"  ⚠️  Xung đột: đã tồn tại tại {existing}")
-        result = resolve_conflict(skill_name, existing, skill_path, conflict_policy, dry_run)
-        if result == "skipped":
-            return False
-        if result == "merged":
-            return True
-
+        conflict_result = resolve_conflict(skill_name, existing, skill_path, conflict_policy, dry_run)
+        if conflict_result == "skipped":
+            return "skipped"
+        if conflict_result == "merged":
+            return "skipped"  # Merged = không thêm mới, chỉ ghi chú
 
     # Sao chép vào thư mục đích
     dest_dir = os.path.join(SKILLS_DIR, domain, skill_name)
@@ -265,7 +293,7 @@ def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run):
         print(f"     ✅ Đã lưu: {dest_dir}")
     else:
         print(f"     [DRY-RUN] Sẽ lưu tại: {dest_dir}")
-    return True
+    return "added"
 
 
 def process_repo(source, global_conflict, dry_run):
@@ -309,14 +337,17 @@ def process_repo(source, global_conflict, dry_run):
 
     added = 0
     skipped = 0
+    rejected = 0
     for sp in skill_paths:
-        ok = ingest_one_skill(sp, domain_hint, conflict_policy, dry_run)
-        if ok:
+        result = ingest_one_skill(sp, domain_hint, conflict_policy, dry_run)
+        if result == "added":
             added += 1
+        elif result == "rejected":
+            rejected += 1
         else:
             skipped += 1
 
-    return added, skipped
+    return added, skipped, rejected
 
 
 def rebuild_hub():
@@ -362,16 +393,19 @@ def main():
 
     total_added = 0
     total_skipped = 0
+    total_rejected = 0
 
     for source in sources:
-        added, skipped = process_repo(source, args.conflict, args.dry_run)
+        added, skipped, rejected = process_repo(source, args.conflict, args.dry_run)
         total_added += added
         total_skipped += skipped
+        total_rejected += rejected
 
     print(f"\n{'='*60}")
     print(f"📊 KẾT QUẢ PIPELINE:")
     print(f"   ✅ Đã thêm:    {total_added} skills mới")
     print(f"   ⏭️  Bỏ qua:    {total_skipped} skills (đã có hoặc quá giống)")
+    print(f"   🚫 Từ chối:   {total_rejected} skills (không đạt Quality Gate)")
     print(f"{'='*60}")
 
     if not args.dry_run and total_added > 0:

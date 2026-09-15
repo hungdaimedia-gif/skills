@@ -31,14 +31,22 @@ Chạy 1 lần duy nhất. Script sẽ tạo symlink từ repo vào 2 thư mục
 - `~/.agents/skills/` (Codex, Antigravity IDE, các agent khác)
 - `~/.claude/skills/` (Claude Code)
 
+### 🍎 Trên macOS / Linux:
 ```bash
 bash scripts/link-skills.sh
+# Hoặc: python3 scripts/link_skills.py
 ```
+
+### 🪟 Trên Windows:
+Mở PowerShell hoặc Git Bash và chạy:
+```powershell
+python scripts/link_skills.py
+```
+*(Script tự động tạo Junction/Symlink vào `%USERPROFILE%\.agents\skills` và `%USERPROFILE%\.claude\skills`, tự động fallback sang copy nếu không có quyền admin).*
 
 Kết quả: **Mọi dự án trên máy bạn** đều có thể gọi `/dsg`, `/tdd`, `/code-review`... ngay lập tức, không cần cấu hình thêm gì.
 
-> **Cập nhật sau này**: Chỉ cần `git pull` trong thư mục repo. Vì dùng symlink,
-> toàn bộ `~/.agents/skills/` tự động nhận skills mới ngay lập tức.
+> **Cập nhật sau này**: Chỉ cần `git pull` trong thư mục repo. Toàn bộ skills được tự động cập nhật ngay lập tức.
 
 ---
 

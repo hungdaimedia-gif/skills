@@ -69,11 +69,49 @@ branch_mapping = {
     "wizard": "🚀 Nền tảng & Vận hành",
     "setup-matt-pocock-skills": "🚀 Nền tảng & Vận hành",
     "migrate-to-shoehorn": "🚀 Nền tảng & Vận hành",
-    "scaffold-exercises": "🚀 Nền tảng & Vận hành"
+    "scaffold-exercises": "🚀 Nền tảng & Vận hành",
+
+    # Sáng tác & Viết truyện
+    "novel-world-building": "📖 Cốt truyện & Thế giới",
+    "story-character-arc": "🎭 Nhân vật & Tâm lý",
+
+    # Đồ họa & Tranh AI
+    "midjourney-prompt-architect": "🎨 Prompt & Bố cục Thị giác",
+
+    # Tài chính & Đầu tư
+    "financial-statement-analyzer": "📊 Phân tích BCTC & Dòng tiền"
+}
+
+# Domain mapping heuristic
+domain_mapping = {
+    "novel-world-building": "✍️ Sáng tác & Viết truyện",
+    "story-character-arc": "✍️ Sáng tác & Viết truyện",
+    "midjourney-prompt-architect": "🎨 Đồ họa & Tranh AI",
+    "financial-statement-analyzer": "📈 Tài chính & Đầu tư"
 }
 
 # Rich Vietnamese Explanations for all skills
 vi_explanations = {
+    "novel-world-building": {
+        "what": "Kiến tạo thế giới & bối cảnh truyện: Thiết lập quy tắc phép thuật, công nghệ, lịch sử và địa chính trị có logic chặt chẽ.",
+        "when": "Dùng khi bắt đầu sáng tác tiểu thuyết, truyện dài hoặc viết kịch bản phim/game.",
+        "benefit": "Thế giới truyện có chiều sâu sống động như thật, không bao giờ bị dính lỗi logic mâu thuẫn (plot holes)."
+    },
+    "story-character-arc": {
+        "what": "Khắc họa chiều sâu tâm lý nhân vật: Xây dựng xung đột nội tâm, vết thương quá khứ và hành trình chuyển hóa nội tâm.",
+        "when": "Dùng khi muốn nhân vật có hồn, lay động cảm xúc độc giả thay vì các khuôn mẫu một màu.",
+        "benefit": "Nhân vật chân thực, có động lực hành động thuyết phục và hành trình trưởng thành cảm xúc."
+    },
+    "midjourney-prompt-architect": {
+        "what": "Kỹ nghệ thiết kế prompt hình ảnh AI: Kiểm soát góc máy, ống kính, ánh sáng, chất liệu và color grading cinematic.",
+        "when": "Dùng khi tạo ảnh với Midjourney v6, Flux.1 hoặc Stable Diffusion.",
+        "benefit": "Tạo ra các tác phẩm thị giác đỉnh cao chuẩn nhiếp ảnh, thoát khỏi hình ảnh AI sáo rỗng (nhựa / generic)."
+    },
+    "financial-statement-analyzer": {
+        "what": "Phân tích báo cáo tài chính chuyên sâu: Đo lường chất lượng dòng tiền, kiểm tra nợ vay và phát hiện rủi ro xào nấu số liệu.",
+        "when": "Dùng khi đầu tư chứng khoán, thẩm định doanh nghiệp hoặc đánh giá sức khỏe đối tác.",
+        "benefit": "Nhìn thấu bản chất kinh doanh thực sự đằng sau các con số kế toán bóng bẩy."
+    },
     "dsg": {
         "what": "Trạm điều phối thông minh & Phân tích sâu: Tự động quét dự án, phát hiện nút thắt và tự kích hoạt chuỗi skill phù hợp để mổ xẻ vấn đề dứt điểm.",
         "when": "Dùng khi bạn thấy rối, không nhớ tên skill tiếng Anh, hoặc muốn agent tự chẩn đoán và làm ngay mà không hỏi lại.",
@@ -355,6 +393,7 @@ for root, dirs, files in os.walk(skills_dir):
             description = lines[0] if lines else "Engineering skill for coding agents."
             
         branch = branch_mapping.get(skill_name, "⚡ Viết Code & TDD")
+        domain = domain_mapping.get(skill_name, "💻 Lập trình & Kỹ thuật")
         
         # Pull Vietnamese explanation
         vi_meta = vi_explanations.get(skill_name, {
@@ -367,6 +406,7 @@ for root, dirs, files in os.walk(skills_dir):
             "id": skill_name,
             "name": name,
             "category": category,
+            "domain": domain,
             "branch": branch,
             "userInvoked": user_invoked,
             "description": description,       # Original English / source description
@@ -375,7 +415,7 @@ for root, dirs, files in os.walk(skills_dir):
             "path": f"skills/{rel}/SKILL.md"
         })
 
-skills.sort(key=lambda s: (s["branch"], s["name"]))
+skills.sort(key=lambda s: (s["domain"], s["branch"], s["name"]))
 
 output_js = os.path.join(output_web_dir, "skills-data.js")
 with open(output_js, "w", encoding="utf-8") as f:

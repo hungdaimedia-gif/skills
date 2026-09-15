@@ -23,8 +23,14 @@ Agent tự chạy các bước kiểm tra ngầm không làm phiền người d�
 
 ---
 
-### BƯỚC 2: Chẩn Đoán & Định Tuyến Nút Thắt (Bottleneck Diagnosis)
-Phân loại chính xác tình trạng dự án vào 1 trong 5 tình huống:
+### BƯỚC 2: Nhận Diện Lĩnh Vực & Định Tuyến Nút Thắt (Domain & Bottleneck Routing)
+Trước khi bốc skill, DSG tự động nhận biết Lĩnh Vực (Domain) của yêu cầu:
+- **💻 Lập trình & Phần mềm (Mặc định)**: Áp dụng 6 nhánh kỹ thuật phần mềm (bảng dưới).
+- **✍️ Sáng tác truyện & Nội dung**: Tự động kích hoạt `novel-world-building`, `story-character-arc`, `writing-beats`.
+- **🎨 Đồ họa & Tranh AI**: Tự động kích hoạt `midjourney-prompt-architect`.
+- **📈 Tài chính & Đầu tư**: Tự động kích hoạt `financial-statement-analyzer`.
+
+Khi ở trong Domain Lập trình, phân loại chính xác tình trạng dự án:
 
 | Tình Huống Thực Tế | Nút Thắt Nhận Diện | Chuỗi Skill Tự Động Kích Hoạt |
 | :--- | :--- | :--- |

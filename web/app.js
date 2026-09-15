@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   
   // State
   let searchQuery = '';
+  let selectedDomain = 'all';
   let selectedBranch = 'all';
   let filterUserInvoked = true;
   let filterModelInvoked = true;
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // DOM Elements
   const searchInput = document.getElementById('globalSearchInput');
   const clearSearchBtn = document.getElementById('clearSearchBtn');
+  const domainSwitcherPills = document.getElementById('domainSwitcherPills');
   const categoryPills = document.getElementById('categoryFilterPills');
   const checkboxUser = document.getElementById('filterUserInvoked');
   const checkboxModel = document.getElementById('filterModelInvoked');
@@ -256,6 +258,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const q = searchQuery.toLowerCase().trim();
 
     const filtered = skillsData.filter(s => {
+      // Domain filter
+      if (selectedDomain !== 'all' && s.domain !== selectedDomain) {
+        return false;
+      }
+
       // Branch filter
       if (selectedBranch !== 'all' && s.branch !== selectedBranch) {
         return false;
@@ -427,6 +434,21 @@ document.addEventListener('DOMContentLoaded', () => {
     filterAndRenderSkills();
     searchInput.focus();
   });
+
+  if (domainSwitcherPills) {
+    domainSwitcherPills.querySelectorAll('.domain-pill').forEach(pill => {
+      pill.addEventListener('click', () => {
+        domainSwitcherPills.querySelectorAll('.domain-pill').forEach(p => p.classList.remove('active'));
+        pill.classList.add('active');
+        selectedDomain = pill.getAttribute('data-domain') || 'all';
+        selectedBranch = 'all';
+        categoryPills.querySelectorAll('.filter-pill').forEach(p => {
+          p.classList.toggle('active', p.getAttribute('data-branch') === 'all');
+        });
+        filterAndRenderSkills();
+      });
+    });
+  }
 
   categoryPills.querySelectorAll('.filter-pill').forEach(pill => {
     pill.addEventListener('click', () => {

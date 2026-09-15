@@ -296,9 +296,19 @@ def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run):
     return "added"
 
 
+REPO_PATTERN = re.compile(r"^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$")
+
+
 def process_repo(source, global_conflict, dry_run):
     """Clone 1 repo và nạp tất cả skills từ đó."""
-    repo = source.get("repo")
+    repo = source.get("repo", "")
+
+    # === SECURITY: Validate repo name format trước khi dùng trong bất kỳ path/command nào ===
+    if not REPO_PATTERN.match(repo):
+        print(f"\n❌ SECURITY REJECT: repo name không hợp lệ: {repo!r}")
+        print("   Chỉ cho phép format: 'owner/repo' (chữ cái, số, dấu gạch, chấm)")
+        return 0, 0, 0
+
     branch = source.get("branch", "main")
     skills_dir = source.get("skills_dir", "skills")
     domain_hint = source.get("domain", None)

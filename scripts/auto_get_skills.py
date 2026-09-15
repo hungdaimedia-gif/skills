@@ -163,12 +163,98 @@ def validate_skill(skill_name, content, domain):
     return score, report
 
 
-def print_quality_report(score, report):
+def generate_fix_instructions(report, skill_name, content):
+    """Tạo hướng dẫn sửa cụ thể cho từng Gate bị lỗi."""
+    fixes = []
+
+    g1 = report.get("gate1_structure", {})
+    if g1.get("score", 20) < 20:
+        details = g1.get("details", "")
+        if "name_valid=False" in details:
+            fixes.append(
+                f"  🔧 [Gate 1] Tên skill không hợp lệ: '{skill_name}'\n"
+                f"     → Chỉ dùng chữ thường, số và dấu gạch ngang: [a-z0-9-]\n"
+                f"     → Sửa thành: '{skill_name.lower().replace(' ', '-').replace('_', '-')}'"
+            )
+        if "desc=False" in details:
+            fixes.append(
+                "  🔧 [Gate 1] Description quá ngắn hoặc thiếu trong frontmatter\n"
+                "     → Thêm vào SKILL.md:\n"
+                "       description: \"Mô tả rõ ràng ít nhất 20 ký tự, tối đa 200 ký tự.\""
+            )
+        if "name=False" in details:
+            fixes.append(
+                "  🔧 [Gate 1] Thiếu field 'name' trong frontmatter YAML\n"
+                "     → Thêm vào đầu SKILL.md:\n"
+                "       ---\n"
+                "       name: ten-skill-cua-ban\n"
+                "       description: \"...\"\n"
+                "       ---"
+            )
+
+    g2 = report.get("gate2_substance", {})
+    if g2.get("score", 30) < 30:
+        details = g2.get("details", "")
+        word_m = __import__("re").search(r"words=(\d+)", details)
+        word_count = int(word_m.group(1)) if word_m else 0
+        missing = []
+        if "when=False" in details:
+            missing.append("'khi nào dùng' (thêm: 'Use when: ...' hoặc 'Khi nào: ...')")
+        if "what=False" in details:
+            missing.append("'làm gì' (thêm: 'What it does: ...' hoặc '## Mục đích')")
+        if "steps=False" in details:
+            missing.append("'các bước' (thêm: '## Steps' hoặc '## Quy trình' với danh sách bước)")
+        if word_count < 150:
+            fixes.append(
+                f"  🔧 [Gate 2] Nội dung quá ngắn: {word_count} từ (cần ≥ 150 từ)\n"
+                f"     → Cần viết thêm khoảng {150 - word_count} từ nữa"
+            )
+        if missing:
+            fixes.append(
+                f"  🔧 [Gate 2] Thiếu các phần bắt buộc:\n"
+                + "\n".join(f"     → {m}" for m in missing)
+            )
+
+    g3 = report.get("gate3_novelty", {})
+    if g3.get("score", 20) < 20:
+        details = g3.get("details", "")
+        sim_m = __import__("re").search(r"max_desc_similarity=(\d+)%", details)
+        sim_pct = int(sim_m.group(1)) if sim_m else 0
+        fixes.append(
+            f"  🔧 [Gate 3] Description quá giống skill đã có ({sim_pct}% tương đồng)\n"
+            f"     → Kiểm tra: python3 scripts/auto_get_skills.py --dry-run\n"
+            f"     → Làm rõ điểm khác biệt của skill này so với skill tương tự\n"
+            f"     → Hoặc xem xét mở rộng skill đã có thay vì tạo mới"
+        )
+
+    g5 = report.get("gate5_safety", {})
+    if g5.get("score", 15) < 15:
+        details = g5.get("details", "")
+        fixes.append(
+            f"  🔧 [Gate 5] Skill vi phạm nguyên tắc an toàn\n"
+            f"     → Vi phạm phát hiện: {details}\n"
+            f"     → Xem quy tắc tại: SKILL_STANDARDS.md#gate-5-an-toàn--triết-lý"
+        )
+
+    return fixes
+
+
+def print_quality_report(score, report, skill_name="", content=""):
+    """In báo cáo chất lượng đầy đủ với hướng dẫn sửa cụ thể."""
     status = "✅ PASS" if score >= 70 else "❌ REJECT"
     print(f"     🔬 Quality Gate [{status}] — {score}/100 điểm")
     for gate, data in report.items():
         icon = "✅" if data["score"] == data["max"] else ("⚠️ " if data["score"] > 0 else "❌")
         print(f"        {icon} {gate}: {data['score']}/{data['max']} — {data['details']}")
+
+    if score < 70 and skill_name:
+        fixes = generate_fix_instructions(report, skill_name, content)
+        if fixes:
+            print(f"\n     📋 HƯỚNG DẪN SỬA ({len(fixes)} vấn đề):")
+            for fix in fixes:
+                print(fix)
+            print(f"\n     💡 Sau khi sửa, chạy lại:")
+            print(f"        python3 scripts/auto_get_skills.py /đường_dẫn/skill")
 
 
 def find_all_skills(repo_local_path, skills_dir_hint="skills"):
@@ -264,7 +350,7 @@ def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run):
 
     # ===== QUALITY GATE CHECK =====
     score, report = validate_skill(skill_name, content, domain)
-    print_quality_report(score, report)
+    print_quality_report(score, report, skill_name=skill_name, content=content)
     if score < 70:
         print(f"  🚫 REJECTED: Điểm {score}/100 thấp hơn ngưỡng 70 — Xem SKILL_STANDARDS.md để biết thêm.")
         return "rejected"

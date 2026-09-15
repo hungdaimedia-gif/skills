@@ -19,21 +19,19 @@ sources:
     branch: "main"
     skills_dir: "skills"
     domain: "engineering"
-    conflict: "skip"          # Giữ bản custom của mình, bỏ qua bản gốc nếu trùng
+    conflict: "skip"
     tags: ["engineering", "tdd", "review", "original"]
 
-  # --- THÊM REPO SKILLS MỚI Ở ĐÂY ---
-  # Ví dụ:
-  # - repo: "another-author/agent-skills"
-  #   branch: "main"
-  #   skills_dir: "skills"
-  #   domain: "engineering"
-  #   conflict: "skip"
-  #   tags: ["productivity"]
-  #
-  # - repo: "some-author/writing-skills"
-  #   branch: "main"
-  #   skills_dir: "."
-  #   domain: "writing"
-  #   conflict: "skip"
-  #   tags: ["creative", "story"]
+  # --- ANTHROPIC OFFICIAL AGENT SKILLS (176k ⭐, 20k 🍴) ---
+  - repo: "anthropics/skills"
+    branch: "main"
+    skills_dir: "skills"
+    conflict: "skip"
+    tags: ["official", "anthropic", "frontend", "art", "productivity", "office"]
+
+  # --- SUPERPOWERS AGENTIC SKILLS FRAMEWORK (286k ⭐, 25k 🍴) ---
+  - repo: "obra/superpowers"
+    branch: "main"
+    skills_dir: "skills"
+    conflict: "skip"
+    tags: ["superpowers", "agent-framework", "subagents", "worktrees", "plans"]

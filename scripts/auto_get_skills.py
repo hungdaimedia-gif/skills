@@ -329,7 +329,7 @@ def resolve_conflict(skill_name, existing_path, new_skill_path, policy, dry_run)
     return "merged"
 
 
-def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run):
+def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run, profile=None, quality_threshold=70):
     """Nạp 1 skill vào kho."""
     skill_md = os.path.join(skill_path, "SKILL.md")
     if not os.path.exists(skill_md):
@@ -345,14 +345,21 @@ def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run):
     domain = detect_domain(skill_name, content, hint=domain_hint)
     branch = detect_branch(skill_name, content)
 
+    # ===== PROFILE FILTER CHECK =====
+    if profile:
+        dest_mock = os.path.join(SKILLS_DIR, domain, skill_name)
+        if not apply_profile_filter(dest_mock, profile):
+            print(f"  ⏭️  Profile filter: bỏ qua '{skill_name}' (không thuộc active_domains hoặc trong exclude_skills)")
+            return "skipped"
+
     print(f"\n  📦 Skill: '{skill_name}'")
     print(f"     Domain: {domain} | Branch: {branch}")
 
     # ===== QUALITY GATE CHECK =====
     score, report = validate_skill(skill_name, content, domain)
     print_quality_report(score, report, skill_name=skill_name, content=content)
-    if score < 70:
-        print(f"  🚫 REJECTED: Điểm {score}/100 thấp hơn ngưỡng 70 — Xem SKILL_STANDARDS.md để biết thêm.")
+    if score < quality_threshold:
+        print(f"  🚫 REJECTED: Điểm {score}/100 thấp hơn ngưỡng {quality_threshold} — Xem SKILL_STANDARDS.md để biết thêm.")
         return "rejected"
 
     # Kiểm tra xung đột
@@ -385,7 +392,7 @@ def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run):
 REPO_PATTERN = re.compile(r"^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$")
 
 
-def process_repo(source, global_conflict, dry_run):
+def process_repo(source, global_conflict, dry_run, profile=None, quality_threshold=70):
     """Clone 1 repo và nạp tất cả skills từ đó."""
     repo = source.get("repo", "")
 
@@ -435,7 +442,8 @@ def process_repo(source, global_conflict, dry_run):
     skipped = 0
     rejected = 0
     for sp in skill_paths:
-        result = ingest_one_skill(sp, domain_hint, conflict_policy, dry_run)
+        result = ingest_one_skill(sp, domain_hint, conflict_policy, dry_run,
+                                 profile=profile, quality_threshold=quality_threshold)
         if result == "added":
             added += 1
         elif result == "rejected":
@@ -569,7 +577,10 @@ def main():
     total_rejected = 0
 
     for source in sources:
-        added, skipped, rejected = process_repo(source, args.conflict, args.dry_run)
+        added, skipped, rejected = process_repo(
+            source, args.conflict, args.dry_run,
+            profile=profile, quality_threshold=quality_threshold
+        )
         total_added += added
         total_skipped += skipped
         total_rejected += rejected

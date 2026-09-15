@@ -1,6 +1,6 @@
 ---
 name: codebase-line-budget-guard
-description: Kỹ thuật thiết lập và vận hành cổng kiểm soát ngân sách dòng code (File Line Budget Guard) ≤ 350 dòng và cơ chế Ratchet Baseline bảo vệ Điều 0 (Zero Destruction) cho dự án phần mềm có AI Coding Agent tham gia. Kích hoạt khi người dùng muốn: thiết lập giới hạn số dòng code cho mỗi file (line budget), chống AI viết file khổng lồ spaghetti code (>1,000 dòng), cài đặt cơ chế Ratchet giữ an toàn cho code legacy cũ, hoặc thiết lập GitHub Actions CI workflow tự động kiểm định chất lượng mã nguồn.
+description: "Kỹ thuật thiết lập và vận hành cổng kiểm soát ngân sách dòng code (File Line Budget Guard) ≤ 350 dòng và cơ chế Ratchet Baseline bảo vệ Điều 0 (Zero Destruction) cho dự án phần mềm có AI Coding Agent tham gia. Kích hoạt khi người dùng muốn: thiết lập giới hạn số dòng code cho mỗi file (line budget), chống AI viết file khổng lồ spaghetti code (>1,000 dòng), cài đặt cơ chế Ratchet giữ an toàn cho code legacy cũ, hoặc thiết lập GitHub Actions CI workflow tự động kiểm định chất lượng mã nguồn."
 ---
 
 # 🛡️ CODEBASE LINE BUDGET GUARD & RATCHET MECHANISM

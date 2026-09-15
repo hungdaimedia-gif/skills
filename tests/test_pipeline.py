@@ -26,6 +26,9 @@ from auto_get_skills import (
     check_collision,
     REPO_PATTERN,
     DOMAIN_MAP,
+    apply_profile_filter,
+    load_profile,
+    list_profiles,
 )
 
 
@@ -381,6 +384,89 @@ class TestIngestionIntegration(unittest.TestCase):
 
 
 # ============================================================
+# TEST CLASS 7: Profiles & Repository Skill Integrity
+# ============================================================
+
+class TestProfileAndRepositoryIntegrity(unittest.TestCase):
+
+    def test_all_existing_skills_have_valid_yaml_frontmatter(self):
+        """Đảm bảo 100% các file SKILL.md trong kho có YAML frontmatter hợp lệ."""
+        import yaml
+        skills_dir = os.path.join(REPO_ROOT, "skills")
+        found_skills = 0
+        slug_pattern = re.compile(r"^[a-z0-9\-]+$")
+
+        for root, dirs, files in os.walk(skills_dir):
+            dirs[:] = [d for d in dirs if d != "node_modules"]
+            if "SKILL.md" in files:
+                found_skills += 1
+                skill_path = os.path.join(root, "SKILL.md")
+                with open(skill_path, "r", encoding="utf-8", errors="ignore") as f:
+                    content = f.read()
+
+                self.assertTrue(content.startswith("---"), f"{skill_path} phải bắt đầu bằng ---")
+                parts = content.split("---", 2)
+                self.assertGreaterEqual(len(parts), 3, f"{skill_path} frontmatter không đóng bằng ---")
+
+                try:
+                    fm = yaml.safe_load(parts[1])
+                except Exception as e:
+                    self.fail(f"YAML parser error in {skill_path}: {e}")
+
+                self.assertIsInstance(fm, dict, f"Frontmatter in {skill_path} phải là dictionary")
+                self.assertIn("name", fm, f"Thiếu field 'name' trong {skill_path}")
+                self.assertIn("description", fm, f"Thiếu field 'description' trong {skill_path}")
+                self.assertTrue(slug_pattern.match(fm["name"]), f"Tên '{fm['name']}' trong {skill_path} không đúng slug")
+                self.assertGreaterEqual(len(str(fm["description"]).strip()), 20, f"Description quá ngắn trong {skill_path}")
+
+        self.assertGreaterEqual(found_skills, 50, f"Kỳ vọng ít nhất 50 skills, tìm thấy {found_skills}")
+
+    def test_apply_profile_filter_domains(self):
+        """Kiểm tra apply_profile_filter lọc đúng domain."""
+        profile = {
+            "active_domains": ["engineering", "productivity"],
+            "exclude_skills": [],
+        }
+        # engineering skill -> cho phép
+        eng_path = os.path.join(REPO_ROOT, "skills", "engineering", "tdd")
+        self.assertTrue(apply_profile_filter(eng_path, profile))
+
+        # art skill -> bị từ chối
+        art_path = os.path.join(REPO_ROOT, "skills", "art", "midjourney-prompt-architect")
+        self.assertFalse(apply_profile_filter(art_path, profile))
+
+    def test_apply_profile_filter_exclude_skills(self):
+        """Kiểm tra apply_profile_filter lọc đúng exclude_skills."""
+        profile = {
+            "active_domains": ["engineering"],
+            "exclude_skills": ["setup-matt-pocock-skills"],
+        }
+        allowed = os.path.join(REPO_ROOT, "skills", "engineering", "tdd")
+        excluded = os.path.join(REPO_ROOT, "skills", "engineering", "setup-matt-pocock-skills")
+
+        self.assertTrue(apply_profile_filter(allowed, profile))
+        self.assertFalse(apply_profile_filter(excluded, profile))
+
+    def test_apply_profile_filter_none_allows_all(self):
+        """Nếu không có profile (profile=None) thì cho phép tất cả."""
+        any_path = os.path.join(REPO_ROOT, "skills", "art", "some-art")
+        self.assertTrue(apply_profile_filter(any_path, None))
+
+    def test_load_profile_hungdaitool(self):
+        """Kiểm tra tải profile hungdaitool hợp lệ."""
+        prof = load_profile("hungdaitool")
+        self.assertIsNotNone(prof)
+        self.assertIn("active_domains", prof)
+        self.assertIn("engineering", prof["active_domains"])
+
+    def test_list_profiles(self):
+        """Kiểm tra liệt kê profiles có sẵn."""
+        profiles = list_profiles()
+        self.assertIn("hungdaitool", profiles)
+        self.assertNotIn("template", profiles)  # template.yml bị loại trừ
+
+
+# ============================================================
 # RUNNER
 # ============================================================
 
@@ -395,6 +481,7 @@ if __name__ == "__main__":
         TestSimilarityScore,
         TestRepoNameSecurity,
         TestIngestionIntegration,
+        TestProfileAndRepositoryIntegrity,
     ]
 
     for cls in test_classes:

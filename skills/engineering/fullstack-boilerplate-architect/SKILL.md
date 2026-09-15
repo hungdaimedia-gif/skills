@@ -1,6 +1,6 @@
 ---
 name: fullstack-boilerplate-architect
-description: Hướng dẫn chuyên sâu cho AI Coding Agent để lựa chọn, khởi tạo (scaffold), cấu trúc 4 tầng chuẩn (Presentation -> Hook -> Domain -> Data), kết nối database và thiết lập Quality Gates cho các bộ Full-Stack Boilerplate hiện đại (T3 Stack, FastAPI + SQLModel + React, AI-First Next.js Agent Stack). Kích hoạt khi người dùng muốn: tạo dự án full-stack mới, chọn framework backend/frontend/database, kết nối frontend với backend qua tRPC hoặc OpenAPI, hoặc chuẩn hóa kiến trúc fullstack có AI cùng tham gia phát triển.
+description: "Hướng dẫn chuyên sâu cho AI Coding Agent để lựa chọn, khởi tạo (scaffold), cấu trúc 4 tầng chuẩn (Presentation -> Hook -> Domain -> Data), kết nối database và thiết lập Quality Gates cho các bộ Full-Stack Boilerplate hiện đại (T3 Stack, FastAPI + SQLModel + React, AI-First Next.js Agent Stack). Kích hoạt khi người dùng muốn: tạo dự án full-stack mới, chọn framework backend/frontend/database, kết nối frontend với backend qua tRPC hoặc OpenAPI, hoặc chuẩn hóa kiến trúc fullstack có AI cùng tham gia phát triển."
 ---
 
 # 🚀 FULLSTACK BOILERPLATE ARCHITECT

@@ -1,6 +1,6 @@
 ---
 name: project-blueprint-loop-architect
-description: Quy trình chuẩn từ Ý tưởng đến Blueprint kiến trúc & Vòng lặp tự vận hành (Loop Engineering) cho dự án phần mềm có AI Agent cùng phát triển. Kích hoạt khi người dùng muốn: khởi tạo dự án mới, biến ý tưởng thô thành blueprint bài bản, thiết lập cơ chế phối hợp giữa các Agent (Claude, Antigravity, Cursor...), tạo rào chắn chống phá hỏng dự án (Guardrails & Invariants), hoặc setup hệ thống Verification Gates và State Tracking chống chệch hướng dài hạn.
+description: "Quy trình chuẩn từ Ý tưởng đến Blueprint kiến trúc & Vòng lặp tự vận hành (Loop Engineering) cho dự án phần mềm có AI Agent cùng phát triển. Kích hoạt khi người dùng muốn: khởi tạo dự án mới, biến ý tưởng thô thành blueprint bài bản, thiết lập cơ chế phối hợp giữa các Agent (Claude, Antigravity, Cursor...), tạo rào chắn chống phá hỏng dự án (Guardrails & Invariants), hoặc setup hệ thống Verification Gates và State Tracking chống chệch hướng dài hạn."
 ---
 
 # 🏛️ PROJECT BLUEPRINT & LOOP ARCHITECT (FROM IDEA TO AUTONOMOUS LOOP)

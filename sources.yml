@@ -1,0 +1,39 @@
+# SKILL SOURCES — Danh sách GitHub repos chứa skills cần nạp tự động
+#
+# Cách dùng:
+#   python3 scripts/auto_get_skills.py              -- Nạp tất cả từ file này
+#   python3 scripts/auto_get_skills.py --dry-run    -- Xem preview, không thay đổi gì
+#   python3 scripts/auto_get_skills.py --repo mattpocock/skills  -- Chỉ 1 repo cụ thể
+#
+# Format mỗi entry:
+#   - repo: "owner/repo-name"         (bắt buộc)
+#     branch: "main"                  (tùy chọn, mặc định: main)
+#     skills_dir: "skills"            (tùy chọn, thư mục chứa skills trong repo)
+#     domain: "engineering"           (tùy chọn: engineering/writing/art/finance)
+#     conflict: "skip"                (tùy chọn: skip | override | merge)
+#     tags: ["tdd", "review"]         (tùy chọn, để tìm kiếm)
+
+sources:
+  # --- NGUỒN GỐC (Original upstream) ---
+  - repo: "mattpocock/skills"
+    branch: "main"
+    skills_dir: "skills"
+    domain: "engineering"
+    conflict: "skip"          # Giữ bản custom của mình, bỏ qua bản gốc nếu trùng
+    tags: ["engineering", "tdd", "review", "original"]
+
+  # --- THÊM REPO SKILLS MỚI Ở ĐÂY ---
+  # Ví dụ:
+  # - repo: "another-author/agent-skills"
+  #   branch: "main"
+  #   skills_dir: "skills"
+  #   domain: "engineering"
+  #   conflict: "skip"
+  #   tags: ["productivity"]
+  #
+  # - repo: "some-author/writing-skills"
+  #   branch: "main"
+  #   skills_dir: "."
+  #   domain: "writing"
+  #   conflict: "skip"
+  #   tags: ["creative", "story"]

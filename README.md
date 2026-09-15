@@ -1,270 +1,188 @@
-<p>
-  <a href="https://www.aihero.dev/s/skills-newsletter">
-    <picture>
-      <source media="(prefers-color-scheme: dark)" srcset="https://res.cloudinary.com/total-typescript/image/upload/v1777382277/skills-repo-dark_2x.png">
-      <source media="(prefers-color-scheme: light)" srcset="https://res.cloudinary.com/total-typescript/image/upload/v1777382277/skill-repo-light_2x.png">
-      <img alt="Skills" src="https://res.cloudinary.com/total-typescript/image/upload/v1777382277/skill-repo-light_2x.png" width="369">
-    </picture>
-  </a>
-</p>
+# 🧠 AI Skills Hub — Đa Lĩnh Vực & Tự Động Hóa Chất Lượng Cao
 
-# Skills For Real Engineers
+[![CI Tests](https://github.com/hungdaimedia-gif/skills/actions/workflows/test.yml/badge.svg)](https://github.com/hungdaimedia-gif/skills/actions/workflows/test.yml)
+[![Skills Count](https://img.shields.io/badge/skills-53%2B-blue.svg)](https://github.com/hungdaimedia-gif/skills)
+[![Quality Gate](https://img.shields.io/badge/Quality%20Gate-5%20Gates%20%7C%20%E2%89%A570pts-success.svg)](./SKILL_STANDARDS.md)
+[![Profiles](https://img.shields.io/badge/Multi--Project-Profiles-orange.svg)](./profiles/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-[![skills.sh](https://skills.sh/b/mattpocock/skills)](https://skills.sh/mattpocock/skills)
+Kho kỹ năng (Skills) toàn diện cho AI Coding Agent & Nhà sáng tạo nội dung — Bao gồm **53+ skills** qua 5 lĩnh vực (**Lập trình**, **Sáng tác**, **Tranh AI**, **Tài chính**, **Năng suất**), tích hợp **Dispatcher thông minh `/dsg`**, **Pipeline tự động nạp từ GitHub**, và **Hệ thống Profile đa dự án**.
 
-My agent skills that I use every day to do real engineering - not vibe coding.
-
-Developing real applications is hard. Approaches like GSD, BMAD, and Spec-Kit try to help by owning the process. But while doing so, they take away your control and make bugs in the process hard to resolve.
-
-These skills are designed to be small, easy to adapt, and composable. They work with any model. They're based on decades of engineering experience. Hack around with them. Make them your own. Enjoy.
+> Tương thích hoàn hảo với: **Antigravity IDE**, **Claude Code**, **Cursor**, **Codex**, **OpenCode**, và các Agent theo chuẩn Markdown `SKILL.md`.
 
 ---
 
-## 🇻🇳 Cài Đặt & Sử Dụng (Tiếng Việt)
+## ⚡ Cài Đặt Nhanh Trong 30 Giây
 
-> Kho này chứa **53 skills đa lĩnh vực** (Lập trình, Sáng tác, Tranh AI, Tài chính) và dispatcher `/dsg` giúp bạn không cần nhớ tên skill tiếng Anh.
->
-> **Xem hướng dẫn đầy đủ**: [INSTALL.md](./INSTALL.md)
+Xem tài liệu cài đặt chi tiết từng bước: [📖 Hướng Dẫn Cài Đặt (INSTALL.md)](./INSTALL.md)
 
-### Cài nhanh 3 bước:
-
+### 1. Cài đặt toàn bộ máy (Dùng cho mọi dự án)
 ```bash
-# 1. Clone về máy
+# Clone kho kỹ năng về máy
 git clone git@github.com:hungdaimedia-gif/skills.git ~/Projects/skills
 
-# 2. Cài vào toàn máy (tất cả dự án đều dùng được ngay)
+# Tạo liên kết symlink vào ~/.agents/skills (Agent tự động nhận diện)
 bash ~/Projects/skills/scripts/link-skills.sh
 
-# 3. Mở Web Hub tra cứu 53 skills trực quan
+# Mở Web Hub giao diện đồ họa tra cứu trực quan
 python3 -m http.server 3333 --directory ~/Projects/skills/web &
 open http://localhost:3333
 ```
 
-Sau bước 2, trong bất kỳ dự án nào, chỉ cần gõ vào AI Agent:
-- **`/dsg`** — Tự động chẩn đoán & chọn skill phù hợp
-- **`/tdd`** — Vòng lặp TDD đỏ-xanh-tối ưu
-- **`/code-review`** — Rà soát code trước commit
-- **`/grill-with-docs`** — Làm rõ yêu cầu trước khi code
+### 2. Kích hoạt trong phiên trò chuyện của Agent
+Sau khi cài đặt, bạn chỉ cần gõ lệnh trong bất kỳ thư mục dự án nào:
+* **`/dsg`** — *Trạm điều phối thông minh*: Agent tự chẩn đoán ngữ cảnh dự án và tự chạy chuỗi skill tương ứng (không cần nhớ tên tiếng Anh).
+* **`/tdd`** — Thực hiện chu trình Test-Driven Development (Đỏ → Xanh → Tối ưu).
+* **`/code-review`** — Rà soát code 2 trục (Tiêu chuẩn repo + Yêu cầu bài toán) trước khi commit.
+* **`/grill-with-docs`** — Phỏng vấn làm rõ ý tưởng, cập nhật `CONTEXT.md` và ADR kiến trúc.
 
 ---
 
-## Installation (30-second setup)
+## 🌟 Điểm Nhấn Công Nghệ
 
-Two ways in, two philosophies. **The [Claude Code plugin](https://code.claude.com/docs/en/plugins)** installs the whole set as a managed, read-only bundle that updates when I ship, so you subscribe rather than fork. **[skills.sh](https://skills.sh/mattpocock/skills)** copies editable skill files into your project, so you can hack on them and make them your own. Pick one: installing both leaves you with every skill twice.
+### 1. 🧠 Trạm Điều Phối Thông Minh `/dsg`
+Không cần phải nhớ hàng chục lệnh tiếng Anh. Gõ `/dsg` hoặc `dsg`, hệ thống sẽ:
+1. Quét cấu trúc dự án và lịch sử trao đổi.
+2. Tự động xác định bạn đang ở giai đoạn nào (*Khởi tạo*, *Lập trình*, *Gỡ lỗi*, hay *Tái cấu trúc*).
+3. Đề xuất và kích hoạt chuỗi kỹ năng tối ưu nhất.
 
+### 2. 🔬 Pipeline Tự Động & 5 Cổng Kiểm Tra Chất Lượng (Quality Gates)
+Tự động nạp skills từ các GitHub repo khác vào kho mà **không lo bị rác, trùng lặp hoặc phá hỏng repo**:
 
-### 1. Get the skills
+```
+GitHub Repo ──► Clone Cache ──► Quét SKILL.md ──► 5 Quality Gates (≥70đ) ──► Phân loại Domain ──► Auto Rebuild Hub
+```
 
-<details>
-<summary><strong>Claude Code</strong></summary>
+| Cổng (Gate) | Tiêu chuẩn kiểm tra | Điểm tối đa |
+|:---|:---|:---:|
+| **Gate 1: Structure** | Frontmatter hợp lệ (`name:`, `description:` 20–200 ký tự), tên chuẩn slug `[a-z0-9-]` | 20đ |
+| **Gate 2: Substance** | Dung lượng ≥ 150 từ, đầy đủ mục tiêu (*Khi nào dùng*, *Mục đích*, *Các bước*) | 30đ |
+| **Gate 3: Novelty** | So khớp với tất cả skills hiện có; từ chối nếu mô tả trùng lặp > 80% | 20đ |
+| **Gate 4: Domain Fit** | Phân loại chính xác vào domain: `engineering`, `writing`, `art`, `finance`, `productivity` | 15đ |
+| **Gate 5: Safety** | Không chứa hành vi nguy hiểm (`git push --force`, `skip tests`, `bỏ qua review`...) | 15đ |
 
+> 💡 **Actionable Feedback Loop**: Nếu skill bị từ chối (< 70đ), pipeline tự động in ra hướng dẫn chi tiết từng dòng cần sửa để bạn hoàn thiện ngay.  
+> Chi tiết tiêu chuẩn: [SKILL_STANDARDS.md](./SKILL_STANDARDS.md)
+
+### 3. 🎯 Hệ Thống Profile Đa Dự Án (`profiles/`)
+Mỗi dự án có thể có nhu cầu sử dụng skill khác nhau. Bạn có thể định cấu hình riêng biệt:
 ```bash
-claude plugins install mattpocock-skills
+# Liệt kê các profile có sẵn
+python3 scripts/auto_get_skills.py --list-profiles
+
+# Chạy nạp theo profile của hungdaitool
+python3 scripts/auto_get_skills.py --profile hungdaitool
+
+# Chạy thử nghiệm xem trước (không sửa file)
+python3 scripts/auto_get_skills.py --dry-run
 ```
+* [hungdaitool.yml](./profiles/hungdaitool.yml): Profile chính cho công việc lập trình, sáng tác và tài chính.
+* [template.yml](./profiles/template.yml): Bản mẫu để bạn tự tạo profile cho dự án mới của riêng mình.
 
-Or, from inside a session:
+### 4. 🌐 Web Hub Tra Cứu Trực Quan (`localhost:3333`)
+Giao diện Web Hub tích hợp sẵn giúp bạn:
+- Tìm kiếm nhanh toàn văn theo tên, mục đích và nội dung skill.
+- Lọc theo từng nhánh làm việc (*Ý tưởng*, *Kiến trúc*, *Viết Code*, *Gỡ lỗi*, *Vận hành*...).
+- Xem nhanh cheatsheet và nút 1-click sao chép prompt cho Agent.
 
-```
-/plugin install mattpocock-skills
-```
+---
 
-It's in Claude Code's official marketplace, so there's nothing to add first, and updates arrive automatically.
+## 📚 Danh Mục Kỹ Năng (53+ Skills)
 
-</details>
+### 💻 1. Engineering (Lập Trình & Kỹ Thuật Hệ Thống)
 
-<details>
-<summary><strong>Codex, and other agents</strong></summary>
+| Kỹ năng | Cách gọi | Mục đích & Quy trình |
+|:---|:---:|:---|
+| **[dsg](./skills/engineering/dsg/SKILL.md)** | Model/User | **Trạm điều phối thông minh**: Tự chẩn đoán ngữ cảnh dự án & chạy chuỗi skill phù hợp |
+| **[tdd](./skills/engineering/tdd/SKILL.md)** | Model/User | Phát triển hướng kiểm thử (Red → Green → Refactor) từng lát cắt tính năng |
+| **[code-review](./skills/engineering/code-review/SKILL.md)** | Model/User | Rà soát diff 2 trục song song: Chuẩn mực code (Standards) & Đúng đặc tả (Spec) |
+| **[diagnosing-bugs](./skills/engineering/diagnosing-bugs/SKILL.md)** | Model/User | Quy trình chẩn đoán bug khó: Tái hiện lỗi đỏ → Giảm thiểu → Giả thuyết → Sửa → Kiểm tra lại |
+| **[agent-disorientation-recovery](./skills/engineering/agent-disorientation-recovery/SKILL.md)** | Model/User | Cứu hộ Agent khi bị quá tải, mất ngữ cảnh sau compaction hoặc lặp lỗi |
+| **[claude-task-runner](./skills/engineering/claude-task-runner/SKILL.md)** | Model/User | Vòng lặp nhận và thực thi tự động các nhiệm vụ từ Tech Lead AI |
+| **[workflow-node-studio](./skills/engineering/workflow-node-studio/SKILL.md)** | Model/User | Thiết kế giao diện Studio canvas và viết Custom Node React Flow (@xyflow/react) |
+| **[chrome-web-store-prep](./skills/engineering/chrome-web-store-prep/SKILL.md)** | Model/User | Chuẩn hoá Chrome Extension MV3, rà soát quyền hạn và chuẩn bị hồ sơ upload Web Store |
+| **[macos-m1-multiagent-setup](./skills/engineering/macos-m1-multiagent-setup/SKILL.md)** | Model/User | Thiết lập hệ thống Multi-Agent AI (CrewAI + OpenRouter) trên MacBook M1 macOS |
+| **[multiagent-setup-crossplatform](./skills/engineering/multiagent-setup-crossplatform/SKILL.md)** | Model/User | Cài đặt và vận hành hệ thống Multi-Agent trên macOS, Linux và Windows |
+| **[code-bug-inspector](./skills/engineering/code-bug-inspector/SKILL.md)** | Model/User | Tự động phân tích, phát hiện lỗi cú pháp, type, import và đề xuất giải pháp sửa chữa |
+| **[codebase-design](./skills/engineering/codebase-design/SKILL.md)** | Model/User | Thiết kế module sâu (Deep Module): giao diện nhỏ gọn, xử lý mạnh mẽ bên dưới |
+| **[domain-modeling](./skills/engineering/domain-modeling/SKILL.md)** | Model/User | Xây dựng và chuẩn hoá mô hình domain, cập nhật `CONTEXT.md` và Architecture Decision Records |
+| **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)** | User | Phỏng vấn làm rõ yêu cầu kết hợp xây dựng từ vựng domain và ghi chép tài liệu kỹ thuật |
+| **[implement](./skills/engineering/implement/SKILL.md)** | User | Hiện thực hoá công việc từ spec/tickets, kết hợp TDD và rà soát code trước commit |
+| **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)** | User | Quét toàn bộ codebase tìm điểm nghẽn kiến trúc và xuất báo cáo HTML trực quan |
+| **[prototype](./skills/engineering/prototype/SKILL.md)** | Model/User | Xây dựng bản mẫu nhanh (Throwaway Prototype) kiểm chứng logic hoặc phương án giao diện |
+| **[research](./skills/engineering/research/SKILL.md)** | Model/User | Nghiên cứu vấn đề kỹ thuật từ nguồn tin cậy và lưu báo cáo markdown trích dẫn đầy đủ |
+| **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)** | Model/User | Xử lý xung đột git merge/rebase từng khối dựa trên chủ đích gốc, không dùng `--abort` |
+| **[system-logs-and-diagnostics](./skills/engineering/system-logs-and-diagnostics/SKILL.md)** | Model/User | Xây dựng hệ thống chẩn đoán từ xa và xử lý lỗi log cho Chrome Extension |
+| **[to-spec](./skills/engineering/to-spec/SKILL.md)** | User | Tổng hợp nội dung cuộc trò chuyện thành bản đặc tả kỹ thuật (Spec) hoàn chỉnh |
+| **[to-tickets](./skills/engineering/to-tickets/SKILL.md)** | User | Chia nhỏ kế hoạch thành các ticket rõ ràng với thứ tự phụ thuộc |
+| **[triage](./skills/engineering/triage/SKILL.md)** | User | Phân loại và điều phối issues qua máy trạng thái phân vai |
+| **[wayfinder](./skills/engineering/wayfinder/SKILL.md)** | User | Lập bản đồ các quyết định lớn cho khối lượng công việc vượt quá một phiên chat |
+| **[wizard](./skills/engineering/wizard/SKILL.md)** | Model/User | Sinh script bash tương tác từng bước hướng dẫn người dùng làm việc thủ công |
+| **[codebase-line-budget-guard](./skills/engineering/codebase-line-budget-guard/SKILL.md)** | Model/User | Giám sát và kiểm soát giới hạn dòng code, đảm bảo tính mô-đun hoá |
+| **[fullstack-boilerplate-architect](./skills/engineering/fullstack-boilerplate-architect/SKILL.md)** | Model/User | Thiết kế khung sườn (boilerplate) fullstack chuẩn mực, sẵn sàng cho sản phẩm thực tế |
+| **[project-blueprint-loop-architect](./skills/engineering/project-blueprint-loop-architect/SKILL.md)** | Model/User | Thiết kế blueprint vòng lặp dự án và chu kỳ lặp lại của Agent |
+| **[setup-matt-pocock-skills](./skills/engineering/setup-matt-pocock-skills/SKILL.md)** | User | Khởi tạo cấu hình issue tracker, labels và thư mục docs cho repo |
+| **[ask-matt](./skills/engineering/ask-matt/SKILL.md)** | User | Bộ định tuyến hỏi đáp gợi ý skill kỹ thuật phù hợp với tình huống |
 
+---
+
+### ✍️ 2. Writing (Sáng Tác & Xây Dựng Cốt Truyện)
+
+* **[novel-world-building](./skills/writing/novel-world-building/SKILL.md)**: Thiết kế thế giới, bối cảnh, hệ thống quy tắc (magic/sci-fi system) và chiều sâu lịch sử cho tác phẩm.
+* **[story-character-arc](./skills/writing/story-character-arc/SKILL.md)**: Xây dựng tâm lý nhân vật, động lực nội tâm (Lie vs Truth), xung đột và hành trình biến đổi sâu sắc.
+* **[writing-beats](./skills/in-progress/writing-beats/SKILL.md)**: Phát triển và sắp xếp các nhịp truyện (story beats) theo cao trào cấu trúc.
+* **[writing-fragments](./skills/in-progress/writing-fragments/SKILL.md)**: Chắp nối các phân cảnh, ý tưởng vụn vặt thành trường đoạn thống nhất.
+* **[writing-shape](./skills/in-progress/writing-shape/SKILL.md)**: Định hình cấu trúc tổng thể và nhịp điệu của toàn bộ tác phẩm.
+
+---
+
+### 🎨 3. Art (Nghệ Thuật Thị Giác & Prompt Kỹ Thuật)
+
+* **[midjourney-prompt-architect](./skills/art/midjourney-prompt-architect/SKILL.md)**: Kiến trúc sư prompt chuyên sâu cho Midjourney v6, Flux.1 và Stable Diffusion: kiểm soát góc máy, ánh sáng, chất liệu, màu sắc và tham số kỹ thuật render.
+
+---
+
+### 📊 4. Finance (Phân Tích Tài Chính & Dòng Tiền)
+
+* **[financial-statement-analyzer](./skills/finance/financial-statement-analyzer/SKILL.md)**: Bóc tách và phân tích chuyên sâu 3 báo cáo tài chính (Bảng CĐKT, Báo cáo KQKD, Báo cáo LCTT): đo lường sức khỏe dòng tiền, chất lượng lợi nhuận và phát hiện rủi ro kế toán.
+
+---
+
+### ⚡ 5. Productivity (Năng Suất & Tương Tác Cùng Agent)
+
+* **[grill-me](./skills/productivity/grill-me/SKILL.md)**: Yêu cầu AI phỏng vấn dồn dập về một kế hoạch, ý tưởng phi kỹ thuật cho đến khi thông suốt.
+* **[grilling](./skills/productivity/grilling/SKILL.md)**: Lõi phỏng vấn truy vấn chuyên sâu dùng làm nền tảng cho các skill định hình ý tưởng.
+* **[handoff](./skills/productivity/handoff/SKILL.md)**: Đóng gói cô đọng toàn bộ ngữ cảnh phiên làm việc để chuyển giao mượt mà sang Agent khác.
+* **[teach](./skills/productivity/teach/SKILL.md)**: Hướng dẫn người dùng học kỹ năng hoặc khái niệm mới qua không gian thực hành trực quan.
+* **[to-questionnaire](./skills/productivity/to-questionnaire/SKILL.md)**: Biến một quyết định nan giải thành bảng câu hỏi khảo sát ngắn gọn, trúng đích.
+* **[wait-what](./skills/productivity/wait-what/SKILL.md)**: Kích hoạt khi lời giải thích của AI khó hiểu — yêu cầu AI giải thích lại bằng ví dụ đời thường.
+* **[writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md)**: Quy chuẩn viết tài liệu cho AI Agent (skills, AGENTS.md, CLAUDE.md).
+
+---
+
+## 🛠️ Công Cụ Quản Lý & Tự Động Hóa
+
+* **[scripts/auto_get_skills.py](./scripts/auto_get_skills.py)**: Bộ máy nạp và kiểm định kỹ năng từ GitHub.
+* **[scripts/link-skills.sh](./scripts/link-skills.sh)**: Script tạo liên kết symlink vào `~/.agents/skills`.
+* **[scripts/build_web_data.py](./scripts/build_web_data.py)**: Trình tạo dữ liệu tự động cho Web Hub.
+* **[tests/test_pipeline.py](./tests/test_pipeline.py)**: Bộ kiểm thử tự động (40 unit tests) bảo vệ pipeline và an toàn bảo mật.
+
+---
+
+## 🤝 Đóng Góp Kỹ Năng Mới
+
+Mọi đóng góp kỹ năng mới đều được chào đón! Trước khi gửi Pull Request, vui lòng tham khảo:
+- [Hướng dẫn Đóng góp (CONTRIBUTING.md)](./CONTRIBUTING.md)
+- [Quy chuẩn 5 Quality Gates (SKILL_STANDARDS.md)](./SKILL_STANDARDS.md)
+
+Chạy kiểm thử trước khi commit:
 ```bash
-npx skills@latest add mattpocock/skills
+python3 tests/test_pipeline.py
 ```
 
-Pick the skills you want, and which coding agents to install them on. **The installer lets you choose which skills to take, so make sure `setup-matt-pocock-skills` is one of them.**
+---
 
-A native Codex plugin is on the roadmap (see [`.agents/adr/0002-ship-as-a-claude-code-plugin.md`](./.agents/adr/0002-ship-as-a-claude-code-plugin.md)).
+## 📄 Bản Quyền & Cảm Ơn
 
-</details>
-
-<details>
-<summary><strong>For tinkerers</strong></summary>
-
-Use the same installer, on any agent, including Claude Code:
-
-```bash
-npx skills@latest add mattpocock/skills
-```
-
-It writes the skills into your repo as ordinary files you own and can edit. Nothing updates behind your back; pull my latest changes when you want them with `npx skills update`.
-
-</details>
-
-### 2. Run `/setup-matt-pocock-skills`
-
-In your agent, run it once per repo. It will:
-
-- Ask you which issue tracker you want to use (GitHub, Linear, or local files)
-- Ask you what labels you apply to tickets when you triage them (`/triage` uses labels)
-- Ask you where you want to save any docs we create
-
-### 3. Bam - you're ready to go.
-
-## Why These Skills Exist
-
-I built these skills as a way to fix common failure modes I see with Claude Code, Codex, and other coding agents.
-
-### #1: The Agent Didn't Do What I Want
-
-> "No-one knows exactly what they want"
->
-> David Thomas & Andrew Hunt, [The Pragmatic Programmer](https://www.amazon.co.uk/Pragmatic-Programmer-Anniversary-Journey-Mastery/dp/B0833F1T3V)
-
-**The Problem**. The most common failure mode in software development is misalignment. You think the dev knows what you want. Then you see what they've built - and you realize it didn't understand you at all.
-
-This is just the same in the AI age. There is a communication gap between you and the agent. The fix for this is a **grilling session** - getting the agent to ask you detailed questions about what you're building.
-
-**The Fix** is to use:
-
-- [`/grill-me`](./skills/productivity/grill-me/SKILL.md) - for non-code uses
-- [`/grill-with-docs`](./skills/engineering/grill-with-docs/SKILL.md) - same as [`/grill-me`](./skills/productivity/grill-me/SKILL.md), but adds more goodies (see below)
-
-These are my most popular skills. They help you align with the agent before you get started, and think deeply about the change you're making. Use them _every_ time you want to make a change.
-
-### #2: The Agent Is Way Too Verbose
-
-> With a ubiquitous language, conversations among developers and expressions of the code are all derived from the same domain model.
->
-> Eric Evans, [Domain-Driven-Design](https://www.amazon.co.uk/Domain-Driven-Design-Tackling-Complexity-Software/dp/0321125215)
-
-**The Problem**: At the start of a project, devs and the people they're building the software for (the domain experts) are usually speaking different languages.
-
-I felt the same tension with my agents. Agents are usually dropped into a project and asked to figure out the jargon as they go. So they use 20 words where 1 will do.
-
-**The Fix** for this is a shared language. It's a document that helps agents decode the jargon used in the project.
-
-<details>
-<summary>
-Example
-</summary>
-
-Here's an example [`CONTEXT.md`](https://github.com/mattpocock/course-video-manager/blob/076a5a7a182db0fe1e62971dd7a68bcadf010f1c/CONTEXT.md), from my `course-video-manager` repo. Which one is easier to read?
-
-- **BEFORE**: "There's a problem when a lesson inside a section of a course is made 'real' (i.e. given a spot in the file system)"
-- **AFTER**: "There's a problem with the materialization cascade"
-
-This concision pays off session after session.
-
-</details>
-
-This is built into [`/grill-with-docs`](./skills/engineering/grill-with-docs/SKILL.md). It's a grilling session, but that helps you build a shared language with the AI, and document hard-to-explain decisions in ADR's.
-
-It's hard to explain how powerful this is. It might be the single coolest technique in this repo. Try it, and see.
-
-> [!TIP]
-> A shared language has many other benefits than reducing verbosity:
->
-> - **Variables, functions and files are named consistently**, using the shared language
-> - As a result, the **codebase is easier to navigate** for the agent
-> - The agent also **spends fewer tokens on thinking**, because it has access to a more concise language
-
-### #3: The Code Doesn't Work
-
-> "Always take small, deliberate steps. The rate of feedback is your speed limit. Never take on a task that’s too big."
->
-> David Thomas & Andrew Hunt, [The Pragmatic Programmer](https://www.amazon.co.uk/Pragmatic-Programmer-Anniversary-Journey-Mastery/dp/B0833F1T3V)
-
-**The Problem**: Let's say that you and the agent are aligned on what to build. What happens when the agent _still_ produces crap?
-
-It's time to look at your feedback loops. Without feedback on how the code it produces actually runs, the agent will be flying blind.
-
-**The Fix**: You need the usual tranche of feedback loops: static types, browser access, and automated tests.
-
-For automated tests, a red-green-refactor loop is critical. This is where the agent writes a failing test first, then fixes the test. This helps give the agent a consistent level of feedback that results in far better code.
-
-I've built a **[`/tdd`](./skills/engineering/tdd/SKILL.md) skill** you can slot into any project. It encourages red-green-refactor and gives the agent plenty of guidance on what makes good and bad tests.
-
-For debugging, I've also built a **[`/diagnosing-bugs`](./skills/engineering/diagnosing-bugs/SKILL.md)** skill that wraps best debugging practices into a disciplined loop, gated phase by phase.
-
-### #4: We Built A Ball Of Mud
-
-> "Invest in the design of the system _every day_."
->
-> Kent Beck, [Extreme Programming Explained](https://www.amazon.co.uk/Extreme-Programming-Explained-Embrace-Change/dp/0321278658)
-
-> "The best modules are deep. They allow a lot of functionality to be accessed through a simple interface."
->
-> John Ousterhout, [A Philosophy Of Software Design](https://www.amazon.co.uk/Philosophy-Software-Design-2nd/dp/173210221X)
-
-**The Problem**: Most apps built with agents are complex and hard to change. Because agents can radically speed up coding, they also accelerate software entropy. Codebases get more complex at an unprecedented rate.
-
-**The Fix** for this is a radical new approach to AI-powered development: caring about the design of the code.
-
-This is built in to every layer of these skills:
-
-- [`/to-spec`](./skills/engineering/to-spec/SKILL.md) quizzes you about which modules you're touching before creating a spec
-
-And crucially, [`/improve-codebase-architecture`](./skills/engineering/improve-codebase-architecture/SKILL.md) surveys a codebase for deepening opportunities and hands you the candidates. I recommend running it on your codebase once every few days. It is a survey, not a rescue: on a genuinely old codebase it will find real candidates, but it won't untangle the mud for you.
-
-### Summary
-
-Software engineering fundamentals matter more than ever. These skills are my best effort at condensing these fundamentals into repeatable practices, to help you ship the best apps of your career. Enjoy.
-
-## Reference
-
-These split on one axis: who can invoke them. **User-invoked** skills are reachable only when you type them (e.g. `/grill-me`); their job is to orchestrate. **Model-invoked** skills can be invoked by you _or_ reached for automatically by the agent when the task fits; they hold the reusable discipline. A user-invoked skill may invoke model-invoked skills, but never another user-invoked one.
-
-### Engineering
-
-Skills I use daily for code work.
-
-**User-invoked**
-
-- **[ask-matt](./skills/engineering/ask-matt/SKILL.md)**: Ask which skill or flow fits your situation. A router over the user-invoked skills in this repo.
-- **[grill-with-docs](./skills/engineering/grill-with-docs/SKILL.md)**: Grilling session that also builds your project's domain model, sharpening terminology and updating `CONTEXT.md` and ADRs inline.
-- **[triage](./skills/engineering/triage/SKILL.md)**: Move issues through a state machine of triage roles.
-- **[improve-codebase-architecture](./skills/engineering/improve-codebase-architecture/SKILL.md)**: Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
-- **[setup-matt-pocock-skills](./skills/engineering/setup-matt-pocock-skills/SKILL.md)**: Configure this repo for the engineering skills (issue tracker, triage labels, domain doc layout). Run once per repo before using the other engineering skills.
-- **[to-spec](./skills/engineering/to-spec/SKILL.md)**: Turn the current conversation into a spec and publish it to the issue tracker. No interview, just synthesizes what you've already discussed.
-- **[to-tickets](./skills/engineering/to-tickets/SKILL.md)**: Break any plan, spec, or conversation into a set of tracer-bullet tickets, each declaring its blocking edges, written as text in a local file, or as native blocking links on a real tracker.
-- **[implement](./skills/engineering/implement/SKILL.md)**: Build the work described by a spec or set of tickets, driving `/tdd` at pre-agreed seams and closing out with `/code-review` before committing.
-- **[wayfinder](./skills/engineering/wayfinder/SKILL.md)**: Plan a huge chunk of work, more than one agent session can hold, as a shared map of decision tickets on the issue tracker, and resolve them one at a time until the way to the destination is clear.
-
-**Model-invoked**
-
-- **[dsg](./skills/engineering/dsg/SKILL.md)**: Trạm điều phối thông minh & Phân tích sâu tự động: Tự động chẩn đoán tình trạng dự án và kích hoạt chuỗi skill phù hợp mà không cần người dùng nhớ tên skill.
-- **[prototype](./skills/engineering/prototype/SKILL.md)**: Build a throwaway prototype to answer a design question, either a single shareable HTML file for state/logic questions, or several radically different UI variations toggleable from one route.
-- **[diagnosing-bugs](./skills/engineering/diagnosing-bugs/SKILL.md)**: Disciplined diagnosis loop for hard bugs and performance regressions: build a feedback loop that goes red on this bug → minimise → hypothesise → instrument → fix → regression-test.
-- **[research](./skills/engineering/research/SKILL.md)**: Investigate a question against high-trust primary sources and capture the findings as a cited Markdown file in the repo, run as a background agent.
-- **[tdd](./skills/engineering/tdd/SKILL.md)**: Test-driven development with a red-green-refactor loop. Builds features or fixes bugs one vertical slice at a time.
-- **[domain-modeling](./skills/engineering/domain-modeling/SKILL.md)**: Actively build and sharpen a project's domain model: challenge terms against the glossary, stress-test with edge-case scenarios, and update `CONTEXT.md` and ADRs inline.
-- **[codebase-design](./skills/engineering/codebase-design/SKILL.md)**: Shared discipline and vocabulary for designing deep modules: a lot of behaviour behind a small interface, placed at a clean seam, testable through that interface.
-- **[code-review](./skills/engineering/code-review/SKILL.md)**: Two-axis review of the diff since a fixed point: **Standards** (does it follow the repo's coding standards, plus a Fowler smell baseline?) and **Spec** (does it faithfully implement the originating issue/spec?), run as parallel sub-agents so neither pollutes the other.
-- **[resolving-merge-conflicts](./skills/engineering/resolving-merge-conflicts/SKILL.md)**: Work through an in-progress git merge or rebase conflict hunk by hunk, resolving by intent traced to each side's primary source, then finish the operation (never `--abort`).
-- **[wizard](./skills/engineering/wizard/SKILL.md)**: Generate an interactive bash wizard that walks a human through steps only they can perform: provisioning infrastructure, setting up credentials or CI secrets, walking an unfamiliar third-party dashboard, or running a one-off migration or cutover.
-- **[agent-disorientation-recovery](./skills/engineering/agent-disorientation-recovery/SKILL.md)**: Recovery protocols when agent loses context, gets stuck in loops, or drifts from project requirements.
-- **[chrome-web-store-prep](./skills/engineering/chrome-web-store-prep/SKILL.md)**: Prepare Chrome Extension MV3 assets, manifest, permissions justification, and privacy policy for store review.
-- **[claude-task-runner](./skills/engineering/claude-task-runner/SKILL.md)**: Task runner and execution loop coordinator for Claude and agent automation workflows.
-- **[code-bug-inspector](./skills/engineering/code-bug-inspector/SKILL.md)**: Static inspection and automatic triage of syntax, type, import, and logic bugs with Python inspector.
-- **[codebase-line-budget-guard](./skills/engineering/codebase-line-budget-guard/SKILL.md)**: Track and enforce line count budgets and modularity limits across repository files.
-- **[fullstack-boilerplate-architect](./skills/engineering/fullstack-boilerplate-architect/SKILL.md)**: Architect and scaffold clean, production-ready fullstack project boilerplates.
-- **[macos-m1-multiagent-setup](./skills/engineering/macos-m1-multiagent-setup/SKILL.md)**: Setup, configure, and optimize local multi-agent environments on Apple Silicon macOS machines.
-- **[multiagent-setup-crossplatform](./skills/engineering/multiagent-setup-crossplatform/SKILL.md)**: Cross-platform multi-agent development setup across macOS, Linux, and Windows.
-- **[project-blueprint-loop-architect](./skills/engineering/project-blueprint-loop-architect/SKILL.md)**: Design project blueprints, state machine loops, and autonomous agent iteration cycles.
-- **[system-logs-and-diagnostics](./skills/engineering/system-logs-and-diagnostics/SKILL.md)**: System logs and diagnostic chains for Chrome Extension MV3 and complex apps.
-- **[workflow-node-studio](./skills/engineering/workflow-node-studio/SKILL.md)**: Canvas studio UI design and custom node development for React Flow workflows.
-
-### Productivity
-
-General workflow tools, not code-specific.
-
-**User-invoked**
-
-- **[grill-me](./skills/productivity/grill-me/SKILL.md)**: Get relentlessly interviewed about a plan or design until every branch of the design tree is resolved.
-- **[handoff](./skills/productivity/handoff/SKILL.md)**: Compact the current conversation into a handoff document so another agent can continue the work.
-- **[teach](./skills/productivity/teach/SKILL.md)**: Teach the user a new skill or concept over multiple sessions, using the current directory as a stateful teaching workspace.
-- **[to-questionnaire](./skills/productivity/to-questionnaire/SKILL.md)**: Turn a decision you can't answer alone into a Markdown questionnaire for the one person who can, filled in async, or together over a meeting. It grills you about the send (who it's for, what you need back), not the subject.
-- **[wait-what](./skills/productivity/wait-what/SKILL.md)**: Fire this the moment a message doesn't land. The agent re-pitches it with the context you're missing, in plain English, using your `CONTEXT.md` vocabulary.
-
-**Model-invoked**
-
-- **[grilling](./skills/productivity/grilling/SKILL.md)**: Interview the user relentlessly about a plan, decision, or idea until every branch of the design tree is resolved. The reusable interview primitive behind `grill-me`, `grill-with-docs`, `triage`, `wayfinder` and `improve-codebase-architecture`.
-- **[writing-for-agents](./skills/productivity/writing-for-agents/SKILL.md)**: Writing documents for agents: skills, AGENTS.md/CLAUDE.md, and any doc an agent reaches by a pointer.
+* Mã nguồn phát hành dưới giấy phép [MIT License](./LICENSE).
+* Khởi nguồn ý tưởng từ kho kỹ năng kỹ thuật của [Matt Pocock](https://github.com/mattpocock/skills) và được mở rộng thành hệ thống quản lý kỹ năng đa lĩnh vực bởi **hungdaimedia-gif**.

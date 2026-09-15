@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agent Skills Hub — Engineering, Not Vibe Coding</title>
+  <meta name="description" content="Kho thư viện 48+ AI Agent Skills chuyên sâu: Grilling, TDD, Code Review, Architecture, Debugging và Khôi phục ngữ cảnh cho Claude Code & AI Coding Agents.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Ambient background glow elements -->
+  <div class="glow-orb orb-1"></div>
+  <div class="glow-orb orb-2"></div>
+  <div class="glow-orb orb-3"></div>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <div class="logo-group">
+        <div class="logo-icon">⚡</div>
+        <div class="logo-text">
+          <span class="logo-title">Skills Hub</span>
+          <span class="logo-badge">v1.2.3 • 48 Skills</span>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <a href="#workflow" class="nav-link">Quy trình</a>
+        <a href="#recommender" class="nav-link">Gợi ý nhanh</a>
+        <a href="#catalog" class="nav-link">Danh mục</a>
+        <a href="https://github.com/hungdaimedia-gif/skills" target="_blank" rel="noopener" class="btn btn-github">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+      <div class="container hero-inner">
+        <div class="hero-pill">
+          <span class="pill-sparkle">✨</span> Chuẩn mực AI Engineering thực thụ
+        </div>
+        <h1 class="hero-title">
+          Engineering, <br>
+          <span class="gradient-text">Not Vibe Coding</span>
+        </h1>
+        <p class="hero-subtitle">
+          Bộ sưu tập <strong>48+ Agent Skills</strong> được tinh chỉnh nhằm loại bỏ triệt để các lỗi cố hữu của coding agent: lạc đề, hiểu sai ý, bành trướng mã nguồn và kẹt vòng lặp.
+        </p>
+
+        <!-- Stats Bar -->
+        <div class="stats-bar">
+          <div class="stat-card">
+            <div class="stat-number">48</div>
+            <div class="stat-label">Skills Tích Hợp</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-card">
+            <div class="stat-number">6</div>
+            <div class="stat-label">Giai Đoạn Vòng Đời</div>
+          </div>
+          <div class="stat-divider"></div>
+          <div class="stat-card">
+            <div class="stat-number">100%</div>
+            <div class="stat-label">Chuẩn Claude & Codex</div>
+          </div>
+        </div>
+
+        <!-- Quick Search Bar -->
+        <div class="hero-search-wrap">
+          <div class="search-input-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="globalSearchInput" placeholder="Tìm kiếm theo tên skill, từ khoá (ví dụ: tdd, review, bug, chrome, react)..." autocomplete="off">
+            <span class="search-kbd-hint">Nhấn <kbd>/</kbd> để tìm</span>
+            <button id="clearSearchBtn" class="clear-btn" style="display: none;">✕</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: WORKFLOW EXPLORER -->
+    <section id="workflow" class="section-workflow">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-tag">QUY TRÌNH 5 BƯỚC</div>
+          <h2 class="section-title">Bản Đồ Phối Hợp Kỹ Năng Trong Dự Án</h2>
+          <p class="section-desc">Click vào từng bước để khám phá ngay các skills then chốt và các combo tác chiến hiệu quả nhất.</p>
+        </div>
+
+        <div class="workflow-steps-nav" id="workflowTabs">
+          <button class="workflow-tab active" data-phase="1. Discovery & Planning">
+            <span class="step-badge">01</span>
+            <span class="step-name">Lên Ý Tưởng & Spec</span>
+          </button>
+          <button class="workflow-tab" data-phase="2. Architecture & Design">
+            <span class="step-badge">02</span>
+            <span class="step-name">Thiết Kế Kiến Trúc</span>
+          </button>
+          <button class="workflow-tab" data-phase="3. Implementation & TDD">
+            <span class="step-badge">03</span>
+            <span class="step-name">Thực Thi & TDD</span>
+          </button>
+          <button class="workflow-tab" data-phase="4. Review & Quality Guardrails">
+            <span class="step-badge">04</span>
+            <span class="step-name">Rà Soát & Quản Trị Mã</span>
+          </button>
+          <button class="workflow-tab" data-phase="5. Debugging & Recovery">
+            <span class="step-badge">05</span>
+            <span class="step-name">Cứu Hộ & Gỡ Lỗi</span>
+          </button>
+          <button class="workflow-tab" data-phase="6. Setup & Operations">
+            <span class="step-badge">06</span>
+            <span class="step-name">Môi Trường & Vận Hành</span>
+          </button>
+        </div>
+
+        <div class="workflow-detail-box" id="workflowDetailBox">
+          <!-- Dynamic info loaded by JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: SMART RECOMMENDER WIZARD -->
+    <section id="recommender" class="section-recommender">
+      <div class="container">
+        <div class="recommender-card">
+          <div class="recommender-header">
+            <div class="recommender-icon">🎯</div>
+            <div>
+              <h3 class="recommender-title">Trình Gợi Ý Nhanh — "Bạn Đang Cần Làm Gì?"</h3>
+              <p class="recommender-sub">Chọn tình huống thực tế của bạn dưới đây, hệ thống sẽ đề xuất ngay skill chuẩn xác và câu lệnh thực thi.</p>
+            </div>
+          </div>
+          <div class="scenarios-grid" id="scenariosGrid">
+            <!-- Populated by JS -->
+          </div>
+          <div class="recommendation-result" id="recommendationResult" style="display: none;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION: MAIN CATALOG -->
+    <section id="catalog" class="section-catalog">
+      <div class="container">
+        <div class="catalog-toolbar">
+          <div class="catalog-title-group">
+            <h2 class="section-title">Kho Thư Viện Skills</h2>
+            <span class="catalog-count-tag" id="skillsCountTag">Đang hiển thị 48 skills</span>
+          </div>
+
+          <!-- Category filter buttons -->
+          <div class="filter-pills" id="categoryFilterPills">
+            <button class="filter-pill active" data-category="all">Tất cả (48)</button>
+            <button class="filter-pill" data-category="engineering">Engineering</button>
+            <button class="filter-pill" data-category="productivity">Productivity</button>
+            <button class="filter-pill" data-category="in-progress">In-Progress</button>
+            <button class="filter-pill" data-category="misc">Misc</button>
+          </div>
+        </div>
+
+        <!-- Secondary invocation filter -->
+        <div class="invocation-filter-bar">
+          <span class="inv-filter-label">Kiểu kích hoạt:</span>
+          <label class="inv-checkbox">
+            <input type="checkbox" id="filterUserInvoked" checked>
+            <span>User-invoked (Lệnh gõ tay)</span>
+          </label>
+          <label class="inv-checkbox">
+            <input type="checkbox" id="filterModelInvoked" checked>
+            <span>Model-invoked (Tự động kích hoạt)</span>
+          </label>
+        </div>
+
+        <!-- Skills Cards Grid -->
+        <div class="skills-grid" id="skillsGrid">
+          <!-- Populated by JS -->
+        </div>
+
+        <div class="no-results-box" id="noResultsBox" style="display: none;">
+          <div class="no-results-icon">🔎</div>
+          <h3>Không tìm thấy skill nào phù hợp</h3>
+          <p>Thử tìm với từ khóa khác hoặc bấm nút bên dưới để xem toàn bộ danh mục.</p>
+          <button class="btn btn-primary" id="resetFiltersBtn">Xem tất cả 48 skills</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- SKILL DETAIL DRAWER / MODAL -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal-panel" id="modalPanel" role="dialog" aria-modal="true">
+      <div class="modal-header">
+        <div class="modal-header-meta">
+          <span class="modal-badge-category" id="modalCategoryBadge">Engineering</span>
+          <span class="modal-badge-type" id="modalTypeBadge">Model-invoked</span>
+          <span class="modal-badge-phase" id="modalPhaseBadge">Phase 1</span>
+        </div>
+        <button class="modal-close-btn" id="modalCloseBtn" aria-label="Đóng">✕</button>
+      </div>
+      
+      <div class="modal-body">
+        <h2 class="modal-title" id="modalTitle">Skill Name</h2>
+        <p class="modal-desc" id="modalDesc">Skill Description goes here...</p>
+
+        <!-- Dedicated Vietnamese Plain Explanation Section -->
+        <div class="modal-vi-section" id="modalViSection">
+          <div class="modal-vi-header">
+            <span>🇻🇳 Giải Thích Tiếng Việt Thực Tế</span>
+          </div>
+          <div class="modal-vi-row">
+            <div class="modal-vi-row-title">💡 Bản chất là gì?</div>
+            <div class="modal-vi-row-content" id="modalViWhat">...</div>
+          </div>
+          <div class="modal-vi-row">
+            <div class="modal-vi-row-title">🎯 Khi nào bạn nên dùng?</div>
+            <div class="modal-vi-row-content" id="modalViWhen">...</div>
+          </div>
+          <div class="modal-vi-row">
+            <div class="modal-vi-row-title">🚀 Lợi ích mang lại:</div>
+            <div class="modal-vi-row-content" id="modalViBenefit">...</div>
+          </div>
+        </div>
+
+        <div class="modal-trigger-box">
+          <div class="trigger-box-title">Cách kích hoạt trong Chat AI</div>
+          <div class="trigger-code-row">
+            <code id="modalTriggerCode">/command-name</code>
+            <button class="btn-copy-code" id="modalCopyTriggerBtn">Sao chép</button>
+          </div>
+        </div>
+
+        <div class="modal-content-section">
+          <div class="content-tab-header">
+            <span>Chi tiết hướng dẫn (SKILL.md preview)</span>
+            <span class="modal-path" id="modalFilePath">skills/.../SKILL.md</span>
+          </div>
+          <pre class="modal-markdown-content" id="modalMarkdownContent"></pre>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modalFooterCloseBtn">Đóng lại</button>
+        <button class="btn btn-primary" id="modalCopyFullBtn">Sao chép hướng dẫn</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>© 2026 Skills Hub • Bộ chuẩn mực AI Coding Agent cấp cao • Dành cho Claude Code, Codex & Antigravity IDE.</p>
+    </div>
+  </footer>
+
+  <script src="skills-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -6,6 +6,19 @@
 
 ---
 
+## GATE 0: UY TÍN CỘNG ĐỒNG (Social Proof Gate) — BẮT BUỘC TRƯỚC KHI CLONE
+
+Trước khi clone bất kỳ repo nào vào máy, pipeline tự động kiểm tra metadata của repo qua GitHub API:
+
+| Tiêu chuẩn uy tín | Ngưỡng bắt buộc | Mục đích ngăn chặn |
+| :--- | :---: | :--- |
+| **Số lượt Stars (⭐)** | **≥ 10,000 ⭐** | Chỉ nhận repo hàng đầu thế giới (Top-tier), chặn triệt để repo rác/vô danh |
+| **Số lượt Forks (🍴)** | **≥ 500 🍴** | Chứng minh có cộng đồng kỹ sư khổng lồ kế thừa và kiểm chứng thực tế |
+| **Độ tươi mới (Freshness)** | **≤ 180 ngày (6 tháng)** | Chặn repo chết yểu, bị bỏ hoang, không tương thích Agent mới |
+| **Trạng thái repo** | **Active (Không Archived)** | Chặn repo đã bị tác giả đóng băng/ngừng bảo trì |
+
+---
+
 ## GATE 1: CẤU TRÚC HỢP LỆ (Structure) — BẮT BUỘC
 
 Skill phải có file `SKILL.md` với:
@@ -56,15 +69,7 @@ Skill phải trả lời được ít nhất 2 trong 3 câu hỏi sau trong nộ
 
 ## GATE 4: PHÙ HỢP DOMAIN (Domain Fit) — BẮT BUỘC
 
-Skill phải rõ ràng thuộc 1 trong 5 domain:
-
-| Domain | Dấu hiệu nhận biết |
-| :--- | :--- |
-| `engineering` | Code, test, architecture, deploy, debug |
-| `writing` | Story, character, plot, novel, creative |
-| `art` | Midjourney, image, visual, prompt, AI art |
-| `finance` | Balance sheet, cash flow, investment, financial |
-| `productivity` | Workflow, handoff, teach, question, meeting |
+Skill phải rõ ràng thuộc 1 trong các domain: `engineering`, `writing`, `art`, `finance`, `productivity`, `misc`.
 
 **Từ chối nếu:**
 - Không thể xác định domain (nội dung quá chung chung, không có chủ đề rõ ràng)
@@ -72,16 +77,16 @@ Skill phải rõ ràng thuộc 1 trong 5 domain:
 
 ---
 
-## GATE 5: AN TOÀN & TRIẾT LÝ (Safety & Philosophy) — BẮT BUỘC
+## GATE 5: AN TOÀN & BẢO MẬT MÃ THỰC THI (Script Security Sandbox) — BẮT BUỘC
 
-Skill KHÔNG được vi phạm các nguyên tắc cốt lõi:
+Cổng bảo mật kiểm tra cả nội dung file `SKILL.md` VÀ quét đệ quy toàn bộ thư mục `scripts/` (các file `.sh`, `.py`, `.js`):
 
-**Từ chối nếu skill:**
-- Khuyến khích bỏ qua test hoặc viết code ẩu để "nhanh hơn"
-- Khuyến khích ghi đè lịch sử Git nguy hiểm (`git push --force`)
-- Khuyến khích viết file đơn lẻ vượt quá 500 dòng mà không có kế hoạch tách module
-- Tự xưng là "luôn đúng" hoặc "không cần con người duyệt" (vi phạm Human-in-the-loop)
-- Có nội dung độc hại, phân biệt đối xử, hoặc vi phạm pháp luật
+**Từ chối và lập tức cách ly nếu phát hiện:**
+1. **Đánh cắp bí mật & biến môi trường**: Truy cập trái phép `$OPENROUTER_API_KEY`, `$ANTHROPIC_API_KEY`, `$OPENAI_API_KEY`, file `.env`, hoặc khóa `.ssh/id_*`.
+2. **Rò rỉ dữ liệu qua mạng (Data Exfiltration)**: Chứa lệnh gửi request ngầm như `curl -d`, `wget --post-data`, `nc -e`, kết nối socket ngầm `/dev/tcp/`.
+3. **Phá hoại hệ thống**: Lệnh xoá nguy hiểm như `rm -rf /`, `rm -rf ~`, `rm -rf $HOME`.
+4. **Thực thi mã độc làm mờ (Obfuscation)**: `base64 -d | sh`, `eval(base64...)`, `curl | bash`.
+5. **Vi phạm đạo đức & triết lý**: Khuyến khích bỏ qua test (`skip test`), ép buộc `git push --force`, hoặc tự xưng "không cần con người kiểm duyệt".
 
 ---
 

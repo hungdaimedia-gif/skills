@@ -162,10 +162,11 @@ Giao diện Web Hub tích hợp sẵn giúp bạn:
 
 ## 🛠️ Công Cụ Quản Lý & Tự Động Hóa
 
-* **[scripts/auto_get_skills.py](./scripts/auto_get_skills.py)**: Bộ máy nạp và kiểm định kỹ năng từ GitHub.
-* **[scripts/link-skills.sh](./scripts/link-skills.sh)**: Script tạo liên kết symlink vào `~/.agents/skills`.
+* **[scripts/auto_get_skills.py](./scripts/auto_get_skills.py)**: Bộ máy tự động săn tìm (`--discover`), kiểm định uy tín Gate 0 (Stars ≥ 10,000, Forks ≥ 500), quét bảo mật sâu `scripts/` (Gate 5), tự động ghi nhận nguồn gốc GitHub (`provenance`) vào `SKILL.md` và lưu vết lịch sử nạp (`--history`).
+* **[scripts/track_usage.py](./scripts/track_usage.py)**: Theo dõi, ghi nhận và thống kê tần suất sử dụng skills của các AI Agent (Claude, Antigravity, Cursor...) trong toàn dự án.
+* **[scripts/link-skills.sh](./scripts/link-skills.sh)**: Script tạo liên kết symlink vào `~/.agents/skills` và `~/.claude/skills`.
 * **[scripts/build_web_data.py](./scripts/build_web_data.py)**: Trình tạo dữ liệu tự động cho Web Hub.
-* **[tests/test_pipeline.py](./tests/test_pipeline.py)**: Bộ kiểm thử tự động (40 unit tests) bảo vệ pipeline và an toàn bảo mật.
+* **[tests/test_pipeline.py](./tests/test_pipeline.py)**: Bộ kiểm thử tự động (55 unit tests) bảo vệ pipeline, sandbox mã độc và tính toàn vẹn hệ thống.
 
 ---
 
@@ -173,7 +174,7 @@ Giao diện Web Hub tích hợp sẵn giúp bạn:
 
 Mọi đóng góp kỹ năng mới đều được chào đón! Trước khi gửi Pull Request, vui lòng tham khảo:
 - [Hướng dẫn Đóng góp (CONTRIBUTING.md)](./CONTRIBUTING.md)
-- [Quy chuẩn 5 Quality Gates (SKILL_STANDARDS.md)](./SKILL_STANDARDS.md)
+- [Quy chuẩn 6 Quality Gates (SKILL_STANDARDS.md)](./SKILL_STANDARDS.md)
 
 Chạy kiểm thử trước khi commit:
 ```bash

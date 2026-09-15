@@ -13,10 +13,15 @@ import os
 import sys
 import shutil
 import re
+import json
 import argparse
 import subprocess
 import tempfile
 import difflib
+import urllib.request
+import urllib.parse
+import urllib.error
+from datetime import datetime, timezone
 
 try:
     import yaml
@@ -29,6 +34,8 @@ SKILLS_DIR = os.path.join(REPO_ROOT, "skills")
 SOURCES_FILE = os.path.join(REPO_ROOT, "sources.yml")
 SCRIPTS_DIR = os.path.join(REPO_ROOT, "scripts")
 CACHE_DIR = os.path.join(REPO_ROOT, ".skill-cache")
+LOGS_DIR = os.path.join(REPO_ROOT, "logs")
+INGESTION_HISTORY_FILE = os.path.join(LOGS_DIR, "ingestion_history.jsonl")
 
 DOMAIN_MAP = {
     "engineering": "engineering",
@@ -87,8 +94,51 @@ WHEN_KEYWORDS = ["when", "use when", "trigger", "activate", "khi nào"]
 WHAT_KEYWORDS = ["what", "purpose", "goal", "how to", "làm gì", "mục đích"]
 STEP_KEYWORDS = ["step", "phase", "bước", "process", "workflow", "protocol", "## "]
 
+# Các mẫu mã độc thực thi trong file .sh, .py, .js bên trong thư mục scripts/
+SCRIPT_DANGER_PATTERNS = [
+    (r"\b(OPENROUTER|ANTHROPIC|OPENAI|GITHUB|AWS|GEMINI)_[A-Z_]*KEY\b", "Đọc biến môi trường chứa API Key"),
+    (r"\bcurl\s+[^|\n]*(-d|--data|-F|--form)\b", "Gửi dữ liệu ngầm ra mạng qua curl"),
+    (r"\bwget\s+[^|\n]*--post-data\b", "Gửi dữ liệu ngầm ra mạng qua wget"),
+    (r"\b(nc|ncat|netcat)\s+.*-e\b", "Mở reverse shell ngầm"),
+    (r"/dev/tcp/\d+", "Mở kết nối socket ngầm qua /dev/tcp"),
+    (r"\brm\s+-[a-zA-Z]*r[a-zA-Z]*f[a-zA-Z]*\s+(/|~|\$HOME|\.\.)(\s|$)", "Lệnh xoá huỷ diệt root hoặc home directory"),
+    (r"\bbase64\s+(-d|--decode)\s*\|\s*(ba)?sh\b", "Thực thi mã hoá base64 qua shell"),
+    (r"\beval\s*\(\s*base64", "Hàm eval giải mã chuỗi base64"),
+    (r"\b(curl|wget)\s+[^|\n]+\|\s*(ba)?sh\b", "Tải và thực thi script trực tiếp qua pipe shell"),
+    (r"\.ssh/id_", "Cố tình truy cập private SSH key"),
+]
 
-def validate_skill(skill_name, content, domain):
+
+def scan_script_safety(skill_dir_path):
+    """Quét đệ quy toàn bộ thư mục skill tìm mã độc trong file thực thi (.sh, .py, .js...).
+    Trả về (is_safe: bool, violations: list[str]).
+    """
+    if not skill_dir_path or not os.path.isdir(skill_dir_path):
+        return True, []
+
+    script_exts = {".sh", ".bash", ".py", ".js", ".mjs", ".zsh"}
+    violations = []
+
+    for root, _, files in os.walk(skill_dir_path):
+        for file in files:
+            ext = os.path.splitext(file)[1].lower()
+            if ext in script_exts:
+                file_path = os.path.join(root, file)
+                rel_path = os.path.relpath(file_path, skill_dir_path)
+                try:
+                    with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+                        code = f.read()
+                    for pattern, desc in SCRIPT_DANGER_PATTERNS:
+                        m = re.search(pattern, code, re.IGNORECASE)
+                        if m:
+                            violations.append(f"{rel_path}: {desc} ('{m.group(0)}')")
+                except Exception as e:
+                    violations.append(f"{rel_path}: Không thể đọc file ({e})")
+
+    return (len(violations) == 0), violations
+
+
+def validate_skill(skill_name, content, domain, skill_dir_path=None):
     """Chấm điểm skill theo 5 Quality Gates (0-100). Trả về (score, report)."""
     report = {}
     score = 0
@@ -120,7 +170,6 @@ def validate_skill(skill_name, content, domain):
     score += g2
 
     # Gate 3: Novelty — cross-check description vs ALL existing skills
-    # So sánh description của skill mới với description của tất cả skills đang có.
     desc_m = re.search(r"^description:\s*(.+)", content, re.MULTILINE)
     new_desc = desc_m.group(1).strip() if desc_m else ""
     max_cross_sim = 0.0
@@ -153,11 +202,21 @@ def validate_skill(skill_name, content, domain):
     report["gate4_domain"] = {"score": g4, "max": 15, "details": f"domain={domain}"}
     score += g4
 
-    # Gate 5: Safety (15đ)
+    # Gate 5: Safety (15đ) — Quét cả Markdown và thư mục scripts/
     danger_hits = [p for p in DANGER_PATTERNS if re.search(p, text_lower)]
-    g5 = 0 if danger_hits else 15
-    report["gate5_safety"] = {"score": g5, "max": 15,
-                               "details": f"violations={'none' if not danger_hits else danger_hits}"}
+    script_safe, script_violations = scan_script_safety(skill_dir_path) if skill_dir_path else (True, [])
+
+    if danger_hits or not script_safe:
+        g5 = 0
+        details_list = []
+        if danger_hits:
+            details_list.append(f"md_violations={danger_hits}")
+        if script_violations:
+            details_list.append(f"script_violations={script_violations}")
+        report["gate5_safety"] = {"score": 0, "max": 15, "details": "; ".join(details_list)}
+    else:
+        g5 = 15
+        report["gate5_safety"] = {"score": 15, "max": 15, "details": "violations=none"}
     score += g5
 
     return score, report
@@ -326,10 +385,125 @@ def resolve_conflict(skill_name, existing_path, new_skill_path, policy, dry_run)
         note = f"\n\n<!-- SOURCE: Imported from pipeline, similarity={similarity_pct}% -->\n"
         with open(existing_md, "a", encoding="utf-8") as f:
             f.write(note)
-    return "merged"
+def parse_frontmatter(content):
+    """Tách frontmatter và body từ Markdown."""
+    if not content.startswith("---"):
+        return False, {}, content
+    parts = content.split("---", 2)
+    if len(parts) < 3:
+        return False, {}, content
+    try:
+        fm = yaml.safe_load(parts[1])
+        if isinstance(fm, dict):
+            return True, fm, parts[2]
+    except Exception:
+        pass
+    return False, {}, content
 
 
-def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run, profile=None, quality_threshold=70):
+def inject_provenance_to_skill_md(file_path, repo_meta):
+    """Gắn thông tin nguồn gốc GitHub vào YAML frontmatter của SKILL.md."""
+    if not repo_meta or not os.path.exists(file_path):
+        return
+    try:
+        with open(file_path, "r", encoding="utf-8", errors="ignore") as f:
+            content = f.read()
+
+        has_fm, fm, body = parse_frontmatter(content)
+        if not has_fm or not isinstance(fm, dict):
+            return
+
+        fm["provenance"] = {
+            "source_repo": repo_meta.get("repo", ""),
+            "source_url": repo_meta.get("url", ""),
+            "source_commit": repo_meta.get("commit", ""),
+            "imported_at": repo_meta.get("imported_at", ""),
+            "stars_at_import": repo_meta.get("stars", 0),
+            "forks_at_import": repo_meta.get("forks", 0),
+        }
+
+        new_fm_str = yaml.dump(fm, allow_unicode=True, sort_keys=False).strip()
+        new_content = f"---\n{new_fm_str}\n---\n{body}"
+        with open(file_path, "w", encoding="utf-8") as f:
+            f.write(new_content)
+    except Exception as e:
+        print(f"     ⚠️  Không thể gắn provenance metadata: {e}")
+
+
+def log_ingestion_event(repo_meta, added_skills, rejected_skills, skipped_skills):
+    """Ghi nhật ký lịch sử nạp repo vào file JSON Lines."""
+    if not repo_meta:
+        return
+    try:
+        os.makedirs(LOGS_DIR, exist_ok=True)
+        event = {
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "repo": repo_meta.get("repo", ""),
+            "url": repo_meta.get("url", ""),
+            "commit": repo_meta.get("commit", ""),
+            "stars": repo_meta.get("stars", 0),
+            "forks": repo_meta.get("forks", 0),
+            "added_count": len(added_skills),
+            "added_skills": added_skills,
+            "rejected_count": len(rejected_skills),
+            "rejected_skills": rejected_skills,
+            "skipped_count": len(skipped_skills),
+            "skipped_skills": skipped_skills,
+        }
+        with open(INGESTION_HISTORY_FILE, "a", encoding="utf-8") as f:
+            f.write(json.dumps(event, ensure_ascii=False) + "\n")
+    except Exception as e:
+        print(f"⚠️  Không thể ghi nhật ký lịch sử nạp: {e}")
+
+
+def print_ingestion_history(limit=20):
+    """In bảng lịch sử các lần nạp skill từ GitHub."""
+    if not os.path.exists(INGESTION_HISTORY_FILE):
+        print("📭 Chưa có lịch sử nạp nào được ghi nhận.")
+        return
+
+    events = []
+    with open(INGESTION_HISTORY_FILE, "r", encoding="utf-8", errors="ignore") as f:
+        for line in f:
+            line = line.strip()
+            if line:
+                try:
+                    events.append(json.loads(line))
+                except Exception:
+                    pass
+
+    if not events:
+        print("📭 Chưa có lịch sử nạp nào được ghi nhận.")
+        return
+
+    events.reverse()  # Hiện gần nhất trước
+    events = events[:limit]
+
+    print(f"\n{'='*75}")
+    print(f"📜 LỊCH SỬ NẠP SKILLS TỪ GITHUB (Gần nhất {len(events)} lượt)")
+    print(f"{'='*75}")
+    print(f"{'Thời gian':<20} | {'Repo':<30} | {'Commit':<8} | {'Nạp':<5} | {'Loại':<5}")
+    print(f"{'-'*20}-+-{'-'*30}-+-{'-'*8}-+-{'-'*5}-+-{'-'*5}")
+
+    for ev in events:
+        ts = ev.get("timestamp", "")[:19].replace("T", " ")
+        repo = ev.get("repo", "")[:30]
+        commit = str(ev.get("commit", ""))[:7]
+        added = str(ev.get("added_count", 0))
+        rejected = str(ev.get("rejected_count", 0))
+        print(f"{ts:<20} | {repo:<30} | {commit:<8} | {added:<5} | {rejected:<5}")
+
+        added_list = ev.get("added_skills", [])
+        if added_list:
+            print(f"   └─ ✅ Skills đã nạp: {', '.join(added_list)}")
+        rej_list = ev.get("rejected_skills", [])
+        if rej_list:
+            print(f"   └─ 🚫 Skills bị loại: {', '.join([r.get('name', '') for r in rej_list if isinstance(r, dict)]) or ', '.join(map(str, rej_list))}")
+    print(f"{'='*75}\n")
+
+
+def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run,
+                     profile=None, quality_threshold=70, repo_meta=None):
     """Nạp 1 skill vào kho."""
     skill_md = os.path.join(skill_path, "SKILL.md")
     if not os.path.exists(skill_md):
@@ -355,8 +529,8 @@ def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run, profile=
     print(f"\n  📦 Skill: '{skill_name}'")
     print(f"     Domain: {domain} | Branch: {branch}")
 
-    # ===== QUALITY GATE CHECK =====
-    score, report = validate_skill(skill_name, content, domain)
+    # ===== QUALITY GATE CHECK (5 Gates + Deep Script Security) =====
+    score, report = validate_skill(skill_name, content, domain, skill_dir_path=skill_path)
     print_quality_report(score, report, skill_name=skill_name, content=content)
     if score < quality_threshold:
         print(f"  🚫 REJECTED: Điểm {score}/100 thấp hơn ngưỡng {quality_threshold} — Xem SKILL_STANDARDS.md để biết thêm.")
@@ -383,6 +557,11 @@ def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run, profile=
                 shutil.copytree(s, d, dirs_exist_ok=True)
             else:
                 shutil.copy2(s, d)
+
+        # Gắn provenance metadata vào SKILL.md
+        if repo_meta:
+            inject_provenance_to_skill_md(os.path.join(dest_dir, "SKILL.md"), repo_meta)
+
         print(f"     ✅ Đã lưu: {dest_dir}")
     else:
         print(f"     [DRY-RUN] Sẽ lưu tại: {dest_dir}")
@@ -392,7 +571,114 @@ def ingest_one_skill(skill_path, domain_hint, conflict_policy, dry_run, profile=
 REPO_PATTERN = re.compile(r"^[a-zA-Z0-9_.-]+/[a-zA-Z0-9_.-]+$")
 
 
-def process_repo(source, global_conflict, dry_run, profile=None, quality_threshold=70):
+def verify_repo_social_proof(repo_name, min_stars=10000, min_forks=500, max_stale_days=180):
+    """Kiểm tra uy tín cộng đồng của GitHub repo qua API trước khi nạp (Social Proof Gate).
+    Trả về (passed: bool, reason: str, metadata: dict).
+    """
+    url = f"https://api.github.com/repos/{repo_name}"
+    headers = {
+        "User-Agent": "Skills-Auto-Pipeline/2.0",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    github_token = os.environ.get("GITHUB_TOKEN")
+    if github_token:
+        headers["Authorization"] = f"Bearer {github_token}"
+
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        if e.code == 404:
+            return False, f"Repo '{repo_name}' không tồn tại trên GitHub", {}
+        elif e.code == 403:
+            # Rate limited -> Bỏ qua kiểm tra mạng để không chặn pipeline offline
+            return True, f"GitHub API rate limit (HTTP 403), bỏ qua bước kiểm tra mạng", {}
+        return False, f"Lỗi GitHub API HTTP {e.code}: {e.reason}", {}
+    except Exception as e:
+        return True, f"Không thể kết nối GitHub API ({e}), bỏ qua bước kiểm tra mạng", {}
+
+    stars = data.get("stargazers_count", 0)
+    forks = data.get("forks_count", 0)
+    archived = data.get("archived", False)
+    disabled = data.get("disabled", False)
+    pushed_at_str = data.get("pushed_at", "")
+
+    metadata = {
+        "stars": stars,
+        "forks": forks,
+        "archived": archived,
+        "pushed_at": pushed_at_str,
+        "description": data.get("description", ""),
+    }
+
+    if archived:
+        return False, f"Repo đã bị đóng băng/ngừng phát triển (archived)", metadata
+    if disabled:
+        return False, f"Repo đã bị vô hiệu hóa (disabled)", metadata
+
+    if stars < min_stars:
+        return False, f"Số sao không đạt: {stars} ⭐ (yêu cầu tối thiểu ≥ {min_stars} ⭐)", metadata
+
+    if forks < min_forks:
+        return False, f"Số lượt fork không đạt: {forks} 🍴 (yêu cầu tối thiểu ≥ {min_forks} 🍴)", metadata
+
+    # Kiểm tra ngày commit/push gần nhất
+    if pushed_at_str:
+        try:
+            pushed_dt = datetime.fromisoformat(pushed_at_str.replace("Z", "+00:00"))
+            now_dt = datetime.now(timezone.utc)
+            days_ago = (now_dt - pushed_dt).days
+            metadata["days_since_push"] = days_ago
+            if days_ago > max_stale_days:
+                return False, f"Repo bị bỏ hoang: commit gần nhất cách đây {days_ago} ngày (> {max_stale_days} ngày)", metadata
+        except Exception:
+            pass
+
+    return True, f"Đạt chuẩn uy tín cộng đồng ({stars} ⭐, {forks} 🍴)", metadata
+
+
+def discover_github_skills(query, min_stars=10000, min_forks=500, max_results=5):
+    """Tìm kiếm tự động các repo skill chất lượng cao trên GitHub.
+    Trả về danh sách các repo dict phù hợp.
+    """
+    encoded_query = urllib.parse.quote_plus(f"{query} stars:>={min_stars} forks:>={min_forks} archived:false")
+    url = f"https://api.github.com/search/repositories?q={encoded_query}&sort=stars&order=desc&per_page={max_results}"
+    headers = {
+        "User-Agent": "Skills-Auto-Pipeline/2.0",
+        "Accept": "application/vnd.github.v3+json"
+    }
+    github_token = os.environ.get("GITHUB_TOKEN")
+    if github_token:
+        headers["Authorization"] = f"Bearer {github_token}"
+
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+    except Exception as e:
+        print(f"❌ Lỗi tìm kiếm GitHub API: {e}")
+        return []
+
+    items = data.get("items", [])
+    results = []
+    for item in items:
+        full_name = item.get("full_name", "")
+        if REPO_PATTERN.match(full_name):
+            results.append({
+                "repo": full_name,
+                "stars": item.get("stargazers_count", 0),
+                "forks": item.get("forks_count", 0),
+                "description": item.get("description", "") or "",
+                "url": item.get("html_url", ""),
+                "pushed_at": item.get("pushed_at", ""),
+            })
+
+    return results
+
+
+def process_repo(source, global_conflict, dry_run, profile=None, quality_threshold=70,
+                 social_check=True, min_stars=10000, min_forks=500, max_stale_days=180):
     """Clone 1 repo và nạp tất cả skills từ đó."""
     repo = source.get("repo", "")
 
@@ -401,6 +687,19 @@ def process_repo(source, global_conflict, dry_run, profile=None, quality_thresho
         print(f"\n❌ SECURITY REJECT: repo name không hợp lệ: {repo!r}")
         print("   Chỉ cho phép format: 'owner/repo' (chữ cái, số, dấu gạch, chấm)")
         return 0, 0, 0
+
+    # === GATE 0: SOCIAL PROOF & REPUTATION CHECK ===
+    if social_check:
+        passed, reason, meta = verify_repo_social_proof(
+            repo, min_stars=min_stars, min_forks=min_forks, max_stale_days=max_stale_days
+        )
+        if not passed:
+            print(f"\n🚫 SOCIAL PROOF REJECT: {reason}")
+            print(f"   Bỏ qua repo '{repo}' vì không đạt chuẩn uy tín cộng đồng.")
+            return 0, 0, 0
+        elif meta.get("stars") is not None:
+            days = meta.get("days_since_push", "?")
+            print(f"  ⭐ Social Proof PASS: {meta['stars']} stars, {meta['forks']} forks (commit gần nhất: {days} ngày trước)")
 
     branch = source.get("branch", "main")
     skills_dir = source.get("skills_dir", "skills")
@@ -434,22 +733,49 @@ def process_repo(source, global_conflict, dry_run, profile=None, quality_thresho
         print(f"  [DRY-RUN] Sẽ clone từ: https://github.com/{repo}.git")
         return 0, 0, 0
 
+    # Lấy commit SHA của repo cache
+    ret = subprocess.run(["git", "-C", cache_path, "rev-parse", "--short", "HEAD"],
+                         capture_output=True, text=True, check=False)
+    commit_sha = ret.stdout.strip() if ret.returncode == 0 else "head"
+
+    repo_meta = {
+        "repo": repo,
+        "url": f"https://github.com/{repo}",
+        "branch": branch,
+        "commit": commit_sha,
+        "imported_at": datetime.now(timezone.utc).isoformat(),
+        "stars": meta.get("stars", 0) if isinstance(meta, dict) else 0,
+        "forks": meta.get("forks", 0) if isinstance(meta, dict) else 0,
+    }
+
     # Tìm và nạp tất cả skills
     skill_paths = find_all_skills(cache_path, skills_dir)
-    print(f"  🔍 Tìm thấy {len(skill_paths)} skills trong repo")
+    print(f"  🔍 Tìm thấy {len(skill_paths)} skills trong repo (commit: {commit_sha})")
 
     added = 0
     skipped = 0
     rejected = 0
+    added_list = []
+    rejected_list = []
+    skipped_list = []
+
     for sp in skill_paths:
+        sk_name = os.path.basename(sp)
         result = ingest_one_skill(sp, domain_hint, conflict_policy, dry_run,
-                                 profile=profile, quality_threshold=quality_threshold)
+                                 profile=profile, quality_threshold=quality_threshold,
+                                 repo_meta=repo_meta)
         if result == "added":
             added += 1
+            added_list.append(sk_name)
         elif result == "rejected":
             rejected += 1
+            rejected_list.append(sk_name)
         else:
             skipped += 1
+            skipped_list.append(sk_name)
+
+    # Ghi lại lịch sử nạp vào logs/ingestion_history.jsonl
+    log_ingestion_event(repo_meta, added_list, rejected_list, skipped_list)
 
     return added, skipped, rejected
 
@@ -514,14 +840,25 @@ def apply_profile_filter(skills_dir_path, profile):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Auto Skill Pipeline — Nạp skills từ nhiều GitHub repos")
+    parser = argparse.ArgumentParser(description="Auto Skill Pipeline — Săn tìm và nạp skills từ GitHub repos")
     parser.add_argument("--dry-run", action="store_true", help="Preview, không thay đổi gì")
     parser.add_argument("--repo", help="Chỉ xử lý repo cụ thể (format: owner/repo)")
     parser.add_argument("--conflict", choices=["skip", "override", "merge"],
                         help="Ghi đè policy xung đột toàn cục")
     parser.add_argument("--profile", help="Tên project profile (vd: hungdaitool, my-project)")
     parser.add_argument("--list-profiles", action="store_true", help="Liệt kê tất cả profiles có sẵn")
+    parser.add_argument("--discover", help="Tự động tìm kiếm repo skill trên GitHub theo từ khóa")
+    parser.add_argument("--min-stars", type=int, default=10000, help="Số sao tối thiểu cho Social Proof Gate (mặc định: 10000)")
+    parser.add_argument("--min-forks", type=int, default=500, help="Số lượt fork tối thiểu (mặc định: 500)")
+    parser.add_argument("--max-results", type=int, default=5, help="Số repo tối đa khi tìm kiếm --discover (mặc định: 5)")
+    parser.add_argument("--no-social-check", action="store_true", help="Bỏ qua bước kiểm tra uy tín Social Proof Gate")
+    parser.add_argument("--history", action="store_true", help="Hiển thị lịch sử các lần nạp skill từ GitHub")
     args = parser.parse_args()
+
+    # === SHOW INGESTION HISTORY ===
+    if args.history:
+        print_ingestion_history()
+        sys.exit(0)
 
     # === LIST PROFILES ===
     if args.list_profiles:
@@ -535,37 +872,59 @@ def main():
         print("\nDùng: python3 scripts/auto_get_skills.py --profile <tên>")
         sys.exit(0)
 
-    # === LOAD PROFILE ===
-    profile = None
-    quality_threshold = 70  # default
-    if args.profile:
-        profile = load_profile(args.profile)
-        quality_threshold = profile.get("quality_threshold", 70)
-        prof_meta = profile.get("profile", {})
-        print(f"🎯 PROFILE: {prof_meta.get('name', args.profile)}")
-        print(f"   {prof_meta.get('description', '')}")
-        print(f"   Domains: {', '.join(profile.get('active_domains', ['all']))}")
-        print(f"   Quality threshold: {quality_threshold}/100")
+    # === AUTO-DISCOVER REPOS VIA GITHUB API ===
+    if args.discover:
+        print(f"\n🔎 Đang săn tìm kỹ năng trên GitHub: '{args.discover}' (yêu cầu ≥ {args.min_stars} ⭐, ≥ {args.min_forks} 🍴)...")
+        found_repos = discover_github_skills(
+            args.discover,
+            min_stars=args.min_stars,
+            min_forks=args.min_forks,
+            max_results=args.max_results
+        )
+        if not found_repos:
+            print(f"⚠️  Không tìm thấy repo nào đạt chuẩn uy tín (≥ {args.min_stars} ⭐, ≥ {args.min_forks} 🍴) cho: '{args.discover}'.")
+            sys.exit(0)
 
-    # === LOAD SOURCES ===
-    # Profile có sources riêng → dùng; không có → dùng sources.yml toàn cục
-    if profile and profile.get("sources"):
-        sources = profile["sources"]
-        print(f"   Sources: từ profile ({len(sources)} repos)")
-    elif os.path.exists(SOURCES_FILE):
-        with open(SOURCES_FILE, "r", encoding="utf-8") as f:
-            config = yaml.safe_load(f)
-        sources = config.get("sources", [])
-        print(f"   Sources: từ sources.yml ({len(sources)} repos)")
+        print(f"🎉 Tìm thấy {len(found_repos)} repo uy tín đạt chuẩn cộng đồng:")
+        sources = []
+        for r in found_repos:
+            print(f"   • {r['repo']:35s} ⭐ {r['stars']:<6d} 🍴 {r['forks']:<5d} — {r['description'][:55]}...")
+            sources.append({"repo": r["repo"], "conflict": args.conflict or "skip"})
+
+        # Khi discover, mặc định bỏ qua kiểm tra lại social proof trong loop vì đã lọc sẵn
+        args.no_social_check = True
+
     else:
-        print(f"❌ Không tìm thấy sources.yml và profile không có sources riêng")
-        sys.exit(1)
+        # === LOAD PROFILE ===
+        profile = None
+        quality_threshold = 70  # default
+        if args.profile:
+            profile = load_profile(args.profile)
+            quality_threshold = profile.get("quality_threshold", 70)
+            prof_meta = profile.get("profile", {})
+            print(f"🎯 PROFILE: {prof_meta.get('name', args.profile)}")
+            print(f"   {prof_meta.get('description', '')}")
+            print(f"   Domains: {', '.join(profile.get('active_domains', ['all']))}")
+            print(f"   Quality threshold: {quality_threshold}/100")
 
-    if args.repo:
-        sources = [s for s in sources if s.get("repo") == args.repo]
-        if not sources:
-            print(f"❌ Không tìm thấy repo '{args.repo}'")
+        # === LOAD SOURCES ===
+        if profile and profile.get("sources"):
+            sources = profile["sources"]
+            print(f"   Sources: từ profile ({len(sources)} repos)")
+        elif os.path.exists(SOURCES_FILE):
+            with open(SOURCES_FILE, "r", encoding="utf-8") as f:
+                config = yaml.safe_load(f)
+            sources = config.get("sources", [])
+            print(f"   Sources: từ sources.yml ({len(sources)} repos)")
+        else:
+            print(f"❌ Không tìm thấy sources.yml và profile không có sources riêng")
             sys.exit(1)
+
+        if args.repo:
+            sources = [s for s in sources if s.get("repo") == args.repo]
+            if not sources:
+                print(f"❌ Không tìm thấy repo '{args.repo}'")
+                sys.exit(1)
 
     print(f"\n🚀 AUTO SKILL PIPELINE")
     print(f"   Repos: {len(sources)}")
@@ -579,7 +938,11 @@ def main():
     for source in sources:
         added, skipped, rejected = process_repo(
             source, args.conflict, args.dry_run,
-            profile=profile, quality_threshold=quality_threshold
+            profile=(profile if not args.discover else None),
+            quality_threshold=(quality_threshold if not args.discover else 70),
+            social_check=(not args.no_social_check),
+            min_stars=args.min_stars,
+            min_forks=args.min_forks
         )
         total_added += added
         total_skipped += skipped
@@ -589,7 +952,7 @@ def main():
     print(f"📊 KẾT QUẢ PIPELINE:")
     print(f"   ✅ Đã thêm:    {total_added} skills mới")
     print(f"   ⏭️  Bỏ qua:    {total_skipped} skills (đã có hoặc quá giống)")
-    print(f"   🚫 Từ chối:   {total_rejected} skills (không đạt Quality Gate)")
+    print(f"   🚫 Từ chối:   {total_rejected} skills (không đạt Quality Gate / Social Proof)")
     print(f"{'='*60}")
 
     if not args.dry_run and total_added > 0:

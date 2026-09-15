@@ -203,6 +203,7 @@ Skills I use daily for code work.
 
 **Model-invoked**
 
+- **[dsg](./skills/engineering/dsg/SKILL.md)**: Trạm điều phối thông minh & Phân tích sâu tự động: Tự động chẩn đoán tình trạng dự án và kích hoạt chuỗi skill phù hợp mà không cần người dùng nhớ tên skill.
 - **[prototype](./skills/engineering/prototype/SKILL.md)**: Build a throwaway prototype to answer a design question, either a single shareable HTML file for state/logic questions, or several radically different UI variations toggleable from one route.
 - **[diagnosing-bugs](./skills/engineering/diagnosing-bugs/SKILL.md)**: Disciplined diagnosis loop for hard bugs and performance regressions: build a feedback loop that goes red on this bug → minimise → hypothesise → instrument → fix → regression-test.
 - **[research](./skills/engineering/research/SKILL.md)**: Investigate a question against high-trust primary sources and capture the findings as a cited Markdown file in the repo, run as a background agent.

@@ -10,6 +10,7 @@ skills = []
 
 phase_mapping = {
     # Discovery & Planning
+    "dsg": "1. Discovery & Planning",
     "ask-matt": "1. Discovery & Planning",
     "grill-me": "1. Discovery & Planning",
     "grill-with-docs": "1. Discovery & Planning",
@@ -72,6 +73,11 @@ phase_mapping = {
 
 # Rich Vietnamese Explanations for all skills
 vi_explanations = {
+    "dsg": {
+        "what": "Trạm điều phối thông minh & Phân tích sâu: Tự động quét dự án, phát hiện nút thắt và tự kích hoạt chuỗi skill phù hợp để mổ xẻ vấn đề dứt điểm.",
+        "when": "Dùng khi bạn thấy rối, không nhớ tên skill tiếng Anh, hoặc muốn agent tự chẩn đoán và làm ngay mà không hỏi lại.",
+        "benefit": "Tiết kiệm 100% thời gian tìm kiếm skill, xử lý tận gốc vấn đề mà không phải trả lời câu hỏi thừa."
+    },
     "ask-matt": {
         "what": "Điều hướng quy trình thông minh: Bạn không cần nhớ tên hàng chục skill, chỉ cần nói bạn đang muốn làm gì.",
         "when": "Dùng khi bắt đầu một công việc mới mà chưa biết nên gọi skill nào trước.",

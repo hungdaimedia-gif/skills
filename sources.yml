@@ -35,3 +35,39 @@ sources:
     skills_dir: "skills"
     conflict: "skip"
     tags: ["superpowers", "agent-framework", "subagents", "worktrees", "plans"]
+
+  # --- OWASP SECURITY CHEAT SHEET (30k ⭐, 4k 🍴) ---
+  - repo: "OWASP/CheatSheetSeries"
+    branch: "master"
+    domain: "engineering"
+    conflict: "skip"
+    tags: ["security", "owasp", "auth", "jwt", "appsec"]
+
+  # --- CREWAI MULTI-AGENT ORCHESTRATION (33k ⭐, 4.5k 🍴) ---
+  - repo: "joaomdmoura/crewAI"
+    branch: "main"
+    domain: "engineering"
+    conflict: "skip"
+    tags: ["multi-agent", "crewai", "orchestration", "delegation"]
+
+  # --- LANGGRAPH AGENT STATE MACHINE (18k ⭐, 2.5k 🍴) ---
+  - repo: "langchain-ai/langgraph"
+    branch: "main"
+    domain: "engineering"
+    conflict: "skip"
+    tags: ["state-graph", "cyclical-agent", "checkpoints", "human-in-the-loop"]
+
+  # --- DOCKER AWESOME COMPOSE & MULTI-STAGE (35k ⭐, 6.5k 🍴) ---
+  - repo: "docker/awesome-compose"
+    branch: "master"
+    domain: "engineering"
+    conflict: "skip"
+    tags: ["devops", "docker", "compose", "multi-stage", "production"]
+
+  # --- SYSTEM DESIGN PRIMER (290k ⭐, 46k 🍴) ---
+  - repo: "donnemartin/system-design-primer"
+    branch: "master"
+    domain: "engineering"
+    conflict: "skip"
+    tags: ["system-design", "high-concurrency", "scaling", "caching", "architecture"]
+
